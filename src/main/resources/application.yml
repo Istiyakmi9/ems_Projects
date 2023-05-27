@@ -23,13 +23,13 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://192.168.0.101:3306/onlinedatabuilder
-#    username: istiyak
-#    password: live@Bottomhalf_001
+    url: jdbc:mysql://192.168.0.101:3306/onlinedatabuilder
+    username: istiyak
+    password: live@Bottomhalf_001
 
-    url: jdbc:mysql://localhost:3306/onlinedatabuilder
-    username: root
-    password: istiyak@mi9
+#    url: jdbc:mysql://localhost:3306/onlinedatabuilder
+#    username: root
+#    password: istiyak@mi9
 
 eureka:
   client:
