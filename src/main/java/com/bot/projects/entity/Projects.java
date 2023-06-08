@@ -49,6 +49,14 @@ public class Projects {
     @Transient
     @JsonProperty("ProjectDescription")
     String projectDescription;
+    @Transient
+    @JsonProperty("GrossIncome")
+    float grossIncome;
+    @Transient
+    @JsonProperty("DesignationName")
+    String designationName;
+    @JsonProperty("MemberType")
+    int memberType;
 }
 
 class ProjectDetail {

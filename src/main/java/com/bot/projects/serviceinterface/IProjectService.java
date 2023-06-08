@@ -3,7 +3,8 @@ package com.bot.projects.serviceinterface;
 import com.bot.projects.entity.Projects;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IProjectService {
-    List<Projects> getProjectByUserService(Long employeeId) throws Exception;
+    Map<String, Object> getProjectByUserService(Long employeeId) throws Exception;
 }
