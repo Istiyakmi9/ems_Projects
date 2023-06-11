@@ -1,6 +1,7 @@
 package com.bot.projects.service;
 
 import com.bot.projects.entity.EmployeeRole;
+import com.bot.projects.entity.ProjectAppraisal;
 import com.bot.projects.model.DbParameters;
 import com.bot.projects.entity.Projects;
 import com.bot.projects.repository.LowLevelExecution;
@@ -33,6 +34,7 @@ public class ProjectService implements IProjectService {
         var dataSet = lowLevelExecution.executeProcedure("sp_project_member_get_projects", dbParameters);
         var project = objectMapper.convertValue(dataSet.get("#result-set-1"), new TypeReference<List<Projects>>() {});
         var designation = objectMapper.convertValue(dataSet.get("#result-set-2"), new TypeReference<List<EmployeeRole>>() {});
+        var projectAppraisal = objectMapper.convertValue(dataSet.get("#result-set-3"), new TypeReference<List<ProjectAppraisal>>() {});
         project.forEach(x -> {
             var rolename = designation.stream().filter(i -> i.getRoleId() == x.getDesignationId()).findFirst().get();
             x.setDesignationName(rolename.getRoleName());
@@ -40,6 +42,7 @@ public class ProjectService implements IProjectService {
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("Project", project);
         responseBody.put("Designation", designation);
+        responseBody.put("ProjectAppraisal", projectAppraisal);
         return  responseBody;
     }
 }

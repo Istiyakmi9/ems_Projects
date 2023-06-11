@@ -50,8 +50,8 @@ public class Projects {
     @JsonProperty("ProjectDescription")
     String projectDescription;
     @Transient
-    @JsonProperty("GrossIncome")
-    float grossIncome;
+    @JsonProperty("CTC")
+    float cTC;
     @Transient
     @JsonProperty("DesignationName")
     String designationName;
