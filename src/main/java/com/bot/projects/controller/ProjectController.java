@@ -14,9 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProjectController {
     @Autowired
     IProjectService iProjectService;
-    @RequestMapping(value = "get/{employeeId}", method = RequestMethod.GET)
-    public ResponseEntity<ApiResponse> getProjectByUser(@PathVariable long employeeId) throws Exception {
-        var result = iProjectService.getProjectByUserService(employeeId);
+    @RequestMapping(value = "memberdetail/{employeeId}", method = RequestMethod.GET)
+    public ResponseEntity<ApiResponse> getMembersDetail(@PathVariable long employeeId) throws Exception {
+        var result = iProjectService.getMembersDetailService(employeeId);
+        return ResponseEntity.ok(ApiResponse.Ok(result));
+    }
+
+    @RequestMapping(value = "get/{managerId}", method = RequestMethod.GET)
+    public ResponseEntity<?> getProjects(@PathVariable("managerId") long managerId) throws Exception {
+        var result = iProjectService.getProjectService(managerId);
         return ResponseEntity.ok(ApiResponse.Ok(result));
     }
 }
