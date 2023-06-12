@@ -55,6 +55,12 @@ public class Projects {
     @Transient
     @JsonProperty("DesignationName")
     String designationName;
+    @Transient
+    @JsonProperty("ProjectManagerId")
+    long projectManagerId;
+    @Transient
+    @JsonProperty("Team")
+    String team;
     @JsonProperty("MemberType")
     int memberType;
 }
