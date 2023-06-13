@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "project")
@@ -14,44 +15,88 @@ import java.util.Date;
 @NoArgsConstructor
 public class Projects {
     @Id
-    @Column(name = "ProjectMemberDetailId")
-    @JsonProperty("ProjectMemberDetailId")
-    int projectMemberDetailId;
     @Column(name = "ProjectId")
     @JsonProperty("ProjectId")
     int projectId;
-    @Column(name = "EmployeeId")
-    @JsonProperty("EmployeeId")
-    long employeeId;
-    @Column(name = "DesignationId")
-    @JsonProperty("DesignationId")
-    int designationId;
-    @Column(name = "FullName")
-    @JsonProperty("FullName")
-    String fullName;
-    @Column(name = "Email")
-    @JsonProperty("Email")
-    String email;
-    @Column(name = "IsActive")
-    @JsonProperty("IsActive")
-    boolean isActive;
-    @Column(name = "AssignedOn")
-    @JsonProperty("AssignedOn")
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
-    Date assignedOn;
-    @Column(name = "LastDateOnProject")
-    @JsonProperty("LastDateOnProject")
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
-    Date lastDateOnProject;
-    @Transient
+    @Column(name = "ProjectName")
     @JsonProperty("ProjectName")
     String projectName;
-    @Transient
+    @Column(name = "ProjectDescription")
     @JsonProperty("ProjectDescription")
     String projectDescription;
+    @Column(name = "ProjectStartedOn")
+    @JsonProperty("ProjectStartedOn")
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    Date projectStartedOn;
+
+    @Column(name = "ProjectEndedOn")
+    @JsonProperty("ProjectEndedOn")
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    Date projectEndedOn;
+    @Column(name = "IsClientProject")
+    @JsonProperty("IsClientProject")
+    boolean isClientProject;
+    @Column(name = "ClientId")
+    @JsonProperty("ClientId")
+    long clientId;
+    @Column(name = "HomePageUrl")
+    @JsonProperty("HomePageUrl")
+    String homePageUrl;
+    @Column(name = "DocumentPath")
+    @JsonProperty("DocumentPath")
+    String documentPath;
+    @Column(name = "PageIndexDetail")
+    @JsonProperty("PageIndexDetail")
+    String pageIndexDetail;
+    @Column(name = "KeywordDetail")
+    @JsonProperty("KeywordDetail")
+    String keywordDetail;
+    @Column(name = "DocumentationDetail")
+    @JsonProperty("DocumentationDetail")
+    String documentationDetail;
+    @Column(name = "CompanyId")
+    @JsonProperty("CompanyId")
+    int companyId;
+    @Column(name = "CreatedBy")
+    @JsonProperty("CreatedBy")
+    long createdBy;
+    @Column(name = "UpdatedBy")
+    @JsonProperty("UpdatedBy")
+    long updatedBy;
+    @Column(name = "CreatedOn")
+    @JsonProperty("CreatedOn")
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    Date createdOn;
+    @Column(name = "UpdatedOn")
+    @JsonProperty("UpdatedOn")
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    Date updatedOn;
     @Transient
     @JsonProperty("CTC")
     float cTC;
+    @Transient
+    @JsonProperty("EmployeeId")
+    long employeeId;
+    @Transient
+    @JsonProperty("DesignationId")
+    int designationId;
+    @Transient
+    @JsonProperty("FullName")
+    String fullName;
+    @Transient
+    @JsonProperty("Email")
+    String email;
+    @Transient
+    @JsonProperty("IsActive")
+    boolean isActive;
+    @Transient
+    @JsonProperty("AssignedOn")
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    Date assignedOn;
+    @Transient
+    @JsonProperty("LastDateOnProject")
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    Date lastDateOnProject;
     @Transient
     @JsonProperty("DesignationName")
     String designationName;
@@ -61,27 +106,10 @@ public class Projects {
     @Transient
     @JsonProperty("Team")
     String team;
+    @Transient
     @JsonProperty("MemberType")
     int memberType;
-}
-
-class ProjectDetail {
-    String ProjectName;
-    String ProjectDescription;
-
-    public String getProjectName() {
-        return ProjectName;
-    }
-
-    public void setProjectName(String projectName) {
-        ProjectName = projectName;
-    }
-
-    public String getProjectDescription() {
-        return ProjectDescription;
-    }
-
-    public void setProjectDescription(String projectDescription) {
-        ProjectDescription = projectDescription;
-    }
+    @Transient
+    @JsonProperty("TeamMembers")
+    List<ProjectMembers> teamMembers;
 }
