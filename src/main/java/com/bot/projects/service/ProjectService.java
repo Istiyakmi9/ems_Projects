@@ -109,7 +109,7 @@ public class ProjectService implements IProjectService {
                 result = data.get();
             } else {
                 result = null;
-                throw new Exception("Project does't exist.");
+                throw new Exception("Project doesn't exist.");
             }
         }
 
@@ -131,6 +131,73 @@ public class ProjectService implements IProjectService {
         }
 
         List<ProjectMembers> resultSet = projectMemberRepository.saveAll(projectMembers);
+
+        result.setTeamMembers(resultSet);
+        return result;
+    }
+
+    @Transactional
+    public Projects updateProjectService(int projectId, Projects projects) throws Exception {
+        if (projectId == 0)
+            throw new Exception("Please select a valid project");
+
+        Optional<Projects> resultData = projectRepository.findById(projectId);
+        if (resultData.isEmpty())
+            throw new Exception("Project detail not found.");
+        Projects result = resultData.get();
+        result.setProjectName(projects.getProjectName());
+        result.setProjectDescription(projects.getProjectDescription());
+        result.setHomePageUrl(projects.getHomePageUrl());
+        result.setClientProject(projects.isClientProject());
+        result.setClientId(projects.getClientId());
+        result.setProjectStartedOn(projects.getProjectStartedOn());
+        result.setProjectEndedOn(projects.getProjectEndedOn());
+        projectRepository.save(result);
+
+        List<ProjectMembers> projectMembers = projects.getTeamMembers();
+        List<ProjectMembers> teamMembers = projectMemberRepository.getProjectMemberByProjectId(projectId);
+        if (teamMembers.size() > 0) {
+            List<ProjectMembers> finalTeamMembers = teamMembers;
+            projectMembers.forEach(x -> {
+                var teammemberData = finalTeamMembers.stream().filter(i -> i.getProjectMemberDetailId() == x.getProjectMemberDetailId()).findFirst();
+                if (teammemberData.isPresent()) {
+                    var teammember = teammemberData.get();
+                    teammember.setGrade(x.getGrade());
+                    teammember.setMemberType(x.getMemberType());
+                    teammember.setProjectManagerId(x.getProjectManagerId());
+                    if(x.getTeam() == null || x.getTeam().isEmpty())
+                        teammember.setTeam("CORE");
+                    else
+                        teammember.setTeam(x.getTeam());
+                } else  {
+                    ProjectMembers projectMember = projectMemberRepository.getLastProjectMembersRecordId();
+                    x.setProjectManagerId(projectMember.getProjectManagerId());
+                    x.setProjectMemberDetailId(projectMember.getProjectMemberDetailId()+1);
+                    if(x.getTeam() == null || x.getTeam().isEmpty())
+                        x.setTeam("CORE");
+                    x.setProjectId(projectId);
+                    finalTeamMembers.add(x);
+                }
+            });
+        } else {
+            int id = 0;
+            ProjectMembers projectMember = projectMemberRepository.getLastProjectMembersRecordId();
+            if (projectMember != null){
+                id = projectMember.getProjectMemberDetailId();
+            }
+
+            int i = 0;
+            while(i < projectMembers.size()) {
+                projectMembers.get(i).setProjectId(projectId);
+                projectMembers.get(i).setProjectMemberDetailId(++id);
+                if(projectMembers.get(i).getTeam() == null || projectMembers.get(i).getTeam().isEmpty()) {
+                    projectMembers.get(i).setTeam("CORE");
+                }
+                i++;
+            }
+            teamMembers = projectMembers;
+        }
+        List<ProjectMembers> resultSet = projectMemberRepository.saveAll(teamMembers);
 
         result.setTeamMembers(resultSet);
         return result;

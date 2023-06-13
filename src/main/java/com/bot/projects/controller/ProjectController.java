@@ -30,4 +30,10 @@ public class ProjectController {
         var result = iProjectService.addProjectService(project);
         return ResponseEntity.ok(ApiResponse.Ok(result));
     }
+
+    @RequestMapping(value = "update/{projectId}", method = RequestMethod.PUT)
+    public ResponseEntity<?> updateProject(@RequestBody Projects project, @PathVariable int projectId) throws Exception {
+        var result = iProjectService.updateProjectService(projectId, project);
+        return ResponseEntity.ok(ApiResponse.Ok(result));
+    }
 }

@@ -11,4 +11,5 @@ public interface IProjectService {
 
     List<ProjectDetail> getProjectService(Long managerId) throws Exception;
     Projects addProjectService(Projects project) throws Exception;
+    Projects updateProjectService(int projectId, Projects projects) throws Exception;
 }
