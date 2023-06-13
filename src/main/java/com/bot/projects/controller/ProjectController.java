@@ -36,4 +36,10 @@ public class ProjectController {
         var result = iProjectService.updateProjectService(projectId, project);
         return ResponseEntity.ok(ApiResponse.Ok(result));
     }
+
+    @RequestMapping(value = "getProjectDetail/{projectId}", method = RequestMethod.GET)
+    public ResponseEntity<?> getProjectDetail(@PathVariable int projectId) throws Exception {
+        var result = iProjectService.getProjectDetailService(projectId);
+        return ResponseEntity.ok(ApiResponse.Ok(result));
+    }
 }
