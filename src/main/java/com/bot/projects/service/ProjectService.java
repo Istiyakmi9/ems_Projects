@@ -202,4 +202,37 @@ public class ProjectService implements IProjectService {
         result.setTeamMembers(resultSet);
         return result;
     }
+
+    public Map<String, Object> getProjectDetailService(int projectId) throws Exception {
+        if (projectId <= 0)
+            throw new Exception("Invalid project id passed.");
+
+        List<DbParameters> dbParameters = new ArrayList<>();
+        dbParameters.add(new DbParameters("_ProjectId", projectId, Types.BIGINT));
+        var resultSet = lowLevelExecution.executeProcedure("sp_project_get_page_data", dbParameters);
+
+        var result = objectMapper.convertValue(resultSet.get("#result-set-1"), new TypeReference<List<Projects>>() {});
+        if(result == null || result.size() == 0) {
+            throw new Exception("Project detail not found.");
+        }
+
+        var clients = objectMapper.convertValue(resultSet.get("#result-set-2"), new TypeReference<List<Projects>>() {});
+
+        Map<String, List<ProjectMembers>> membersCollection = new HashMap<>();
+        var members = objectMapper.convertValue(resultSet.get("#result-set-3"), new TypeReference<List<ProjectMembers>>() {});
+        if(members != null && members.size() > 0) {
+            membersCollection = members.stream().collect(
+                    Collectors.groupingBy(
+                            ProjectMembers::getTeam
+                    )
+            );
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("Project", result);
+        map.put("Members", membersCollection);
+        map.put("Clients", clients);
+
+        return map;
+    }
 }
