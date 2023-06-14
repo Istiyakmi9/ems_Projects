@@ -28,33 +28,15 @@ public class ProjectController {
         return ResponseEntity.ok(ApiResponse.Ok(result));
     }
 
-    @RequestMapping(value = "add", method = RequestMethod.POST)
-    public ResponseEntity<?> addProject(@RequestBody Projects project) throws Exception {
-        var result = iProjectService.addProjectService(project);
-        return ResponseEntity.ok(ApiResponse.Ok(result));
-    }
-
-    @RequestMapping(value = "update/{projectId}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateProject(@RequestBody Projects project, @PathVariable int projectId) throws Exception {
-        var result = iProjectService.updateProjectService(projectId, project);
+    @RequestMapping(value = "addUpdateProject/{projectId}", method = RequestMethod.PUT)
+    public ResponseEntity<?> addUpdateProject(@RequestBody Projects project, @PathVariable int projectId) throws Exception {
+        var result = iProjectService.addUpdateProjectService(projectId, project);
         return ResponseEntity.ok(ApiResponse.Ok(result));
     }
 
     @RequestMapping(value = "getProjectDetail/{projectId}", method = RequestMethod.GET)
     public ResponseEntity<?> getProjectDetail(@PathVariable int projectId) throws Exception {
         var result = iProjectService.getProjectDetailService(projectId);
-        return ResponseEntity.ok(ApiResponse.Ok(result));
-    }
-
-    @RequestMapping(value = "addProjectMembers/{projectId}", method = RequestMethod.POST)
-    public ResponseEntity<?> addProjectMembers(@RequestBody List<ProjectMembers> projectMembers, @PathVariable int projectId) throws Exception {
-        var result = iProjectService.addProjectMembersService(projectMembers, projectId);
-        return ResponseEntity.ok(ApiResponse.Ok(result));
-    }
-
-    @RequestMapping(value = "updateProjectMembers/{projectId}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateProjectMembers(@RequestBody List<ProjectMembers> projectMembers, @PathVariable int projectId) throws Exception {
-        var result = iProjectService.updateProjectMembersService(projectMembers, projectId);
         return ResponseEntity.ok(ApiResponse.Ok(result));
     }
 }
