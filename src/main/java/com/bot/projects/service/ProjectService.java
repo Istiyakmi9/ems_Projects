@@ -1,6 +1,5 @@
 package com.bot.projects.service;
 
-import com.bot.projects.entity.EmployeeRole;
 import com.bot.projects.entity.ProjectAppraisal;
 import com.bot.projects.entity.ProjectMembers;
 import com.bot.projects.model.ClientDetail;
@@ -15,15 +14,13 @@ import com.bot.projects.serviceinterface.IProjectService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nullable;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class ProjectService implements IProjectService {
@@ -149,7 +146,9 @@ public class ProjectService implements IProjectService {
         if (projectId == 0)
             projectId = projectsRecords.getProjectId();
 
-        updateProjectMembersService(projects.getTeamMembers(), projectsRecords.getProjectId());
+        var updatedMemberList = updateProjectMembersService(projects.getTeamMembers(), projectsRecords.getProjectId());
+        projectMemberRepository.saveAll(updatedMemberList);
+
         return getProjectDetailService(projectId);
     }
 
@@ -158,11 +157,14 @@ public class ProjectService implements IProjectService {
         dbParameters.add(new DbParameters("_ProjectId", projectId, Types.BIGINT));
         var resultSet = lowLevelExecution.executeProcedure("sp_project_get_page_data", dbParameters);
 
-        var result = objectMapper.convertValue(resultSet.get("#result-set-1"), new TypeReference<List<Projects>>() {});
-        var clients = objectMapper.convertValue(resultSet.get("#result-set-2"), new TypeReference<List<ClientDetail>>() {});
+        var result = objectMapper.convertValue(resultSet.get("#result-set-1"), new TypeReference<List<Projects>>() {
+        });
+        var clients = objectMapper.convertValue(resultSet.get("#result-set-2"), new TypeReference<List<ClientDetail>>() {
+        });
 
         Map<String, List<ProjectMembers>> membersCollection = new HashMap<>();
-        var members = objectMapper.convertValue(resultSet.get("#result-set-3"), new TypeReference<List<ProjectMembers>>() {});
+        var members = objectMapper.convertValue(resultSet.get("#result-set-3"), new TypeReference<List<ProjectMembers>>() {
+        });
         if (members != null && members.size() > 0) {
             membersCollection = members.stream().collect(
                     Collectors.groupingBy(
@@ -181,10 +183,10 @@ public class ProjectService implements IProjectService {
 
     private void deactivateTeam(List<ProjectMembers> oldTeam, List<ProjectMembers> newTeam) {
         int i = 0;
-        while(i < newTeam.size()) {
+        while (i < newTeam.size()) {
             var currentTeam = newTeam.get(i);
             var existingTeam = oldTeam.stream().filter(x -> x.getTeam().equals(currentTeam.getTeam())).toList();
-            if(existingTeam.size() == 0) {
+            if (existingTeam.size() == 0) {
                 oldTeam.stream().
                         filter(x -> x.getEmployeeId() == currentTeam.getEmployeeId())
                         .forEach(p -> p.setActive(false));
@@ -193,89 +195,69 @@ public class ProjectService implements IProjectService {
         }
     }
 
-    private List<ProjectMembers> combineAndUpdateTeamMember(List<ProjectMembers> oldTeam, List<ProjectMembers> newTeam) {
-        for(var item : newTeam) {
-            var member =  oldTeam.stream()
-                    .filter(x -> x.getProjectMemberDetailId() == item.getProjectMemberDetailId())
-                    .findFirst();
-
-            if(member.isEmpty()) {
-                member.get().setActive(false);
-                newTeam.add(member.get());
-            }
-        }
-
-        return newTeam;
-    }
-
-    private Map<String, List<ProjectMembers>> updateProjectMembersService(List<ProjectMembers> projectMembers, int projectId) throws Exception {
-        if (validateMemberInMultiTeam(projectMembers))
-            throw new Exception("Same employee found in multiple teams.");
-
-        List<ProjectMembers> currentTeamMembers = new ArrayList<>();
-        List<ProjectMembers> teamMembers = projectMemberRepository.getProjectMemberByProjectId(projectId);
-        deactivateTeam(teamMembers, projectMembers);
-
-        ProjectMembers projectMember = projectMemberRepository.getLastProjectMembersRecordId();
+    private int addUpdateMembers(List<ProjectMembers> oldTeam, List<ProjectMembers> newTeam, List<ProjectMembers> currentTeamMembers, int id) {
         java.util.Date utilDate = new java.util.Date();
         var date = new java.sql.Timestamp(utilDate.getTime());
 
-        if (teamMembers.size() > 0) {
-            var id = projectMember.getProjectMemberDetailId();
-
-            for (Map.Entry<String, List<ProjectMembers>> newTeamMembers : projectMembers.stream()
-                    .collect(
-                            Collectors.groupingBy(
-                                    ProjectMembers::getTeam
-                            )
-                    ).entrySet()) {
-
-                var oldTeam = teamMembers.stream().filter(x -> x.getTeam().equals(newTeamMembers.getKey())).toList();
-                if (oldTeam.size() == 0) {
-                    id = addNewTeamMembers(currentTeamMembers, newTeamMembers.getValue(), projectId, id, date);
-                } else {
-                    int j = 0;
-                    currentTeamMembers.addAll(newTeamMembers.getValue());
-                    while (j < oldTeam.size()) {
-                        var oldMember = oldTeam.get(j);
-                        var teammemberData = currentTeamMembers.stream()
-                                .filter(i -> i.getProjectMemberDetailId() == oldMember.getProjectMemberDetailId())
-                                .findFirst();
-                        if (teammemberData.isPresent()) {
-                            var teammember = teammemberData.get();
-                            teammember.setProjectMemberDetailId(oldMember.getProjectMemberDetailId());
-                            teammember.setProjectId(oldMember.getProjectId());
-                        } else {
-                            oldMember.setActive(false);
-                            oldMember.setLastDateOnProject(date);
-                            currentTeamMembers.add(oldMember);
-                        }
-                        j++;
-                    }
-                }
+        for (ProjectMembers members : oldTeam) {
+            var current = newTeam.stream().filter(i -> i.getProjectMemberDetailId() == members.getProjectMemberDetailId()).findFirst();
+            if (current.isPresent()) {
+                var member = current.get();
+                member.setMemberType(members.getMemberType());
+                member.setGrade(members.getGrade());
+                member.setActive(true);
+                currentTeamMembers.add((member));
+            } else {
+                members.setActive(false);
+                members.setLastDateOnProject(date);
+                currentTeamMembers.add(members);
             }
-        } else {
-            addNewTeamMembers(currentTeamMembers, projectMembers, projectId, projectMember.getProjectMemberDetailId(), date);
         }
 
-        projectMemberRepository.saveAll(teamMembers);
-        return this.getGroupProjectMember(projectId);
+        return id;
     }
 
-    private int addNewTeamMembers(List<ProjectMembers> existingMembers, List<ProjectMembers> projectMembers, int projectId, int memberId, Date date) {
-        int i = 0;
-        while (i < projectMembers.size()) {
-            projectMembers.get(i).setProjectId(projectId);
-            projectMembers.get(i).setProjectMemberDetailId(++memberId);
-            if (projectMembers.get(i).getTeam() == null || projectMembers.get(i).getTeam().isEmpty())
-                projectMembers.get(i).setTeam("CORE");
+    private void addNewTeam(List<ProjectMembers> newTeam, List<ProjectMembers> currentTeamMembers, int id, int projectId) {
+        java.util.Date utilDate = new java.util.Date();
+        var date = new java.sql.Timestamp(utilDate.getTime());
 
-            projectMembers.get(i).setAssignedOn(date);
-            existingMembers.add(projectMembers.get(i));
-            i++;
+        for(var member : newTeam) {
+            member.setProjectMemberDetailId(++id);
+            member.setActive(true);
+            member.setProjectId(projectId);
+            member.setAssignedOn(date);
+
+            currentTeamMembers.add(member);
         }
+    }
 
-        return memberId;
+    private List<ProjectMembers> updateProjectMembersService(List<ProjectMembers> projectMembers, int projectId) throws Exception {
+        if (validateMemberInMultiTeam(projectMembers))
+            throw new Exception("Same employee found in multiple teams.");
+
+        ProjectMembers projectMember = projectMemberRepository.getLastProjectMembersRecordId();
+        int lastId = projectMember.getProjectMemberDetailId();
+
+        Date utilDate = new Date();
+        var date = new Timestamp(utilDate.getTime());
+
+        List<ProjectMembers> currentTeamMembers = new ArrayList<>();
+
+        List<ProjectMembers> teamMembers = projectMemberRepository.getProjectMemberByProjectId(projectId);
+
+        List<ProjectMembers> existingMembers = projectMembers.stream()
+                .filter(x -> teamMembers.stream().anyMatch(i -> i.getTeam().equals(x.getTeam())))
+                .toList();
+
+        lastId = addUpdateMembers(teamMembers, existingMembers, currentTeamMembers, lastId);
+
+        List<ProjectMembers> newTeamMembers = projectMembers.stream()
+                .filter(x -> teamMembers.stream().noneMatch(i -> i.getTeam().equals(x.getTeam())))
+                .toList();
+
+        addNewTeam(newTeamMembers, currentTeamMembers, lastId, projectId);
+
+        return currentTeamMembers;
     }
 
     private boolean validateMemberInMultiTeam(List<ProjectMembers> members) throws Exception {
@@ -293,18 +275,5 @@ public class ProjectService implements IProjectService {
                 .toList();
 
         return collect.size() > 0;
-    }
-
-    private Map<String, List<ProjectMembers>> getGroupProjectMember(int projectId) {
-        Map<String, List<ProjectMembers>> membersCollection = new HashMap<>();
-        var members = projectMemberRepository.getProjectMemberByProjectId(projectId);
-        if (members != null && members.size() > 0) {
-            membersCollection = members.stream().collect(
-                    Collectors.groupingBy(
-                            ProjectMembers::getTeam
-                    )
-            );
-        }
-        return membersCollection;
     }
 }
