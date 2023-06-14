@@ -190,7 +190,7 @@ public class ProjectService implements IProjectService {
             if(existingTeam.size() == 0) {
                 oldTeam.stream().
                         filter(x -> x.getTeam().equals(currentTeam.getTeam()))
-                        .map(i -> i.setActive(false));
+                        .forEach(p -> p.setActive(false));
             }
             i++;
         }
@@ -220,7 +220,7 @@ public class ProjectService implements IProjectService {
                 var currentTeam = teamMembers.stream().filter(x -> x.getTeam().equals(memberLists.getKey())).toList();
                 if (currentTeam.size() == 0) {
                     // team doesn't exists then insert all records
-                    id = addNewTeamMembers(teamMembers, projectMembers, projectId, id);
+                    id = addNewTeamMembers(teamMembers, projectMembers, projectId, id, date);
                 } else {
                     int j = 0;
                     while (j < currentTeam.size()) {
@@ -249,18 +249,18 @@ public class ProjectService implements IProjectService {
                 }
             }
         } else {
-            addNewTeamMembers(teamMembers, projectMembers, projectId, projectMember.getProjectMemberDetailId());
+            addNewTeamMembers(teamMembers, projectMembers, projectId, projectMember.getProjectMemberDetailId(), date);
         }
 
         projectMemberRepository.saveAll(teamMembers);
         return this.getGroupProjectMember(projectId);
     }
 
-    private int addNewTeamMembers(List<ProjectMembers> existingMembers, List<ProjectMembers> projectMembers, int projectId, int memberId) {
+    private int addNewTeamMembers(List<ProjectMembers> existingMembers, List<ProjectMembers> projectMembers, int projectId, int memberId, Date date) {
         int i = 0;
         while (i < projectMembers.size()) {
             projectMembers.get(i).setProjectId(projectId);
-            projectMembers.get(i).setProjectMemberDetailId(++id);
+            projectMembers.get(i).setProjectMemberDetailId(++memberId);
             if (projectMembers.get(i).getTeam() == null || projectMembers.get(i).getTeam().isEmpty()) {
                 projectMembers.get(i).setTeam("CORE");
             }
