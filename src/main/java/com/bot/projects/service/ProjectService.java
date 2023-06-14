@@ -158,14 +158,11 @@ public class ProjectService implements IProjectService {
         dbParameters.add(new DbParameters("_ProjectId", projectId, Types.BIGINT));
         var resultSet = lowLevelExecution.executeProcedure("sp_project_get_page_data", dbParameters);
 
-        var result = objectMapper.convertValue(resultSet.get("#result-set-1"), new TypeReference<List<Projects>>() {
-        });
-        var clients = objectMapper.convertValue(resultSet.get("#result-set-2"), new TypeReference<List<ClientDetail>>() {
-        });
+        var result = objectMapper.convertValue(resultSet.get("#result-set-1"), new TypeReference<List<Projects>>() {});
+        var clients = objectMapper.convertValue(resultSet.get("#result-set-2"), new TypeReference<List<ClientDetail>>() {});
 
         Map<String, List<ProjectMembers>> membersCollection = new HashMap<>();
-        var members = objectMapper.convertValue(resultSet.get("#result-set-3"), new TypeReference<List<ProjectMembers>>() {
-        });
+        var members = objectMapper.convertValue(resultSet.get("#result-set-3"), new TypeReference<List<ProjectMembers>>() {});
         if (members != null && members.size() > 0) {
             membersCollection = members.stream().collect(
                     Collectors.groupingBy(
@@ -189,17 +186,33 @@ public class ProjectService implements IProjectService {
             var existingTeam = oldTeam.stream().filter(x -> x.getTeam().equals(currentTeam.getTeam())).toList();
             if(existingTeam.size() == 0) {
                 oldTeam.stream().
-                        filter(x -> x.getTeam().equals(currentTeam.getTeam()))
+                        filter(x -> x.getEmployeeId() == currentTeam.getEmployeeId())
                         .forEach(p -> p.setActive(false));
             }
             i++;
         }
     }
 
+    private List<ProjectMembers> combineAndUpdateTeamMember(List<ProjectMembers> oldTeam, List<ProjectMembers> newTeam) {
+        for(var item : newTeam) {
+            var member =  oldTeam.stream()
+                    .filter(x -> x.getProjectMemberDetailId() == item.getProjectMemberDetailId())
+                    .findFirst();
+
+            if(member.isEmpty()) {
+                member.get().setActive(false);
+                newTeam.add(member.get());
+            }
+        }
+
+        return newTeam;
+    }
+
     private Map<String, List<ProjectMembers>> updateProjectMembersService(List<ProjectMembers> projectMembers, int projectId) throws Exception {
         if (validateMemberInMultiTeam(projectMembers))
             throw new Exception("Same employee found in multiple teams.");
 
+        List<ProjectMembers> currentTeamMembers = new ArrayList<>();
         List<ProjectMembers> teamMembers = projectMemberRepository.getProjectMemberByProjectId(projectId);
         deactivateTeam(teamMembers, projectMembers);
 
@@ -210,46 +223,39 @@ public class ProjectService implements IProjectService {
         if (teamMembers.size() > 0) {
             var id = projectMember.getProjectMemberDetailId();
 
-            for (Map.Entry<String, List<ProjectMembers>> memberLists : projectMembers.stream()
+            for (Map.Entry<String, List<ProjectMembers>> newTeamMembers : projectMembers.stream()
                     .collect(
                             Collectors.groupingBy(
                                     ProjectMembers::getTeam
                             )
                     ).entrySet()) {
 
-                var currentTeam = teamMembers.stream().filter(x -> x.getTeam().equals(memberLists.getKey())).toList();
-                if (currentTeam.size() == 0) {
-                    // team doesn't exists then insert all records
-                    id = addNewTeamMembers(teamMembers, projectMembers, projectId, id, date);
+                var oldTeam = teamMembers.stream().filter(x -> x.getTeam().equals(newTeamMembers.getKey())).toList();
+                if (oldTeam.size() == 0) {
+                    id = addNewTeamMembers(currentTeamMembers, newTeamMembers.getValue(), projectId, id, date);
                 } else {
                     int j = 0;
-                    while (j < currentTeam.size()) {
-                        var member = currentTeam.get(j);
-                        var teammemberData = teamMembers.stream().filter(i -> i.getProjectMemberDetailId() == member.getProjectMemberDetailId()).findFirst();
+                    currentTeamMembers.addAll(newTeamMembers.getValue());
+                    while (j < oldTeam.size()) {
+                        var oldMember = oldTeam.get(j);
+                        var teammemberData = currentTeamMembers.stream()
+                                .filter(i -> i.getProjectMemberDetailId() == oldMember.getProjectMemberDetailId())
+                                .findFirst();
                         if (teammemberData.isPresent()) {
                             var teammember = teammemberData.get();
-                            teammember.setGrade(member.getGrade());
-                            teammember.setMemberType(member.getMemberType());
-                            teammember.setProjectManagerId(member.getProjectManagerId());
-                            if (member.getTeam() == null || member.getTeam().isEmpty())
-                                teammember.setTeam("CORE");
-                            else
-                                teammember.setTeam(member.getTeam());
+                            teammember.setProjectMemberDetailId(oldMember.getProjectMemberDetailId());
+                            teammember.setProjectId(oldMember.getProjectId());
                         } else {
-                            member.setProjectManagerId(projectMember.getProjectManagerId());
-                            member.setProjectMemberDetailId(++id);
-                            if (member.getTeam() == null || member.getTeam().isEmpty())
-                                member.setTeam("CORE");
-                            member.setProjectId(projectId);
-                            member.setAssignedOn(date);
-                            teamMembers.add(member);
+                            oldMember.setActive(false);
+                            oldMember.setLastDateOnProject(date);
+                            currentTeamMembers.add(oldMember);
                         }
                         j++;
                     }
                 }
             }
         } else {
-            addNewTeamMembers(teamMembers, projectMembers, projectId, projectMember.getProjectMemberDetailId(), date);
+            addNewTeamMembers(currentTeamMembers, projectMembers, projectId, projectMember.getProjectMemberDetailId(), date);
         }
 
         projectMemberRepository.saveAll(teamMembers);
@@ -261,10 +267,11 @@ public class ProjectService implements IProjectService {
         while (i < projectMembers.size()) {
             projectMembers.get(i).setProjectId(projectId);
             projectMembers.get(i).setProjectMemberDetailId(++memberId);
-            if (projectMembers.get(i).getTeam() == null || projectMembers.get(i).getTeam().isEmpty()) {
+            if (projectMembers.get(i).getTeam() == null || projectMembers.get(i).getTeam().isEmpty())
                 projectMembers.get(i).setTeam("CORE");
-            }
+
             projectMembers.get(i).setAssignedOn(date);
+            existingMembers.add(projectMembers.get(i));
             i++;
         }
 
