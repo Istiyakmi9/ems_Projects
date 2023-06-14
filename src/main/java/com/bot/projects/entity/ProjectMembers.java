@@ -1,5 +1,6 @@
 package com.bot.projects.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -44,10 +45,12 @@ public class ProjectMembers {
     @JsonProperty("MemberType")
     int memberType;
     @Column(name = "AssignedOn")
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     @JsonProperty("AssignedOn")
     Date assignedOn;
     @Column(name = "LastDateOnProject")
     @JsonProperty("LastDateOnProject")
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     Date lastDateOnProject;
     @Column(name = "Team")
     @JsonProperty("Team")

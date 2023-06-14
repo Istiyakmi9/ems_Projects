@@ -28,7 +28,6 @@ public class Projects {
     @JsonProperty("ProjectStartedOn")
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     Date projectStartedOn;
-
     @Column(name = "ProjectEndedOn")
     @JsonProperty("ProjectEndedOn")
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
@@ -100,7 +99,6 @@ public class Projects {
     @Transient
     @JsonProperty("DesignationName")
     String designationName;
-    @Transient
     @JsonProperty("ProjectManagerId")
     long projectManagerId;
     @Transient
