@@ -131,6 +131,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>projects</finalName>
 	</build>
 	<repositories>
 		<repository>
