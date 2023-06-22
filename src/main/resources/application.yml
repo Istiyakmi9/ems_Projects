@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    active: default
+    active: dev
   application:
     name: employee-project-service
 
@@ -26,10 +26,6 @@ spring:
     url: jdbc:mysql://192.168.0.101:3306/onlinedatabuilder
     username: istiyak
     password: live@Bottomhalf_001
-
-#    url: jdbc:mysql://localhost:3306/onlinedatabuilder
-#    username: root
-#    password: istiyak@mi9
 
 eureka:
   client:
