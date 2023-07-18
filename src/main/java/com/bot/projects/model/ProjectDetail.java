@@ -4,12 +4,50 @@ import com.bot.projects.entity.ProjectMembers;
 import com.bot.projects.entity.Projects;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 public class ProjectDetail extends Projects {
     @JsonProperty("ProjectMemberDetailId")
     int projectMemberDetailId;
+    @JsonProperty("EmployeeId")
+    long employeeId;
+    @JsonProperty("DesignationId")
+    int designationId;
+    @JsonProperty("FullName")
+    String fullName;
+    @JsonProperty("Email")
+    String email;
+    @JsonProperty("IsActive")
+    boolean isActive;
+    @JsonProperty("AssignedOn")
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    Date assignedOn;
+    @JsonProperty("LastDateOnProject")
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    Date lastDateOnProject;
+    @JsonProperty("DesignationName")
+    String designationName;
+    @JsonProperty("ProjectManagerId")
+    long projectManagerId;
+    @JsonProperty("Team")
+    String team;
+    @JsonProperty("MemberType")
+    int memberType;
+    @JsonProperty("TeamMembers")
+    List<ProjectMembers> teamMembers;
+    @JsonProperty("ExprienceInYear")
+    BigDecimal exprienceInYear;
+
+    public BigDecimal getExprienceInYear() {
+        return exprienceInYear;
+    }
+
+    public void setExprienceInYear(BigDecimal exprienceInYear) {
+        this.exprienceInYear = exprienceInYear;
+    }
 
     public int getProjectMemberDetailId() {
         return projectMemberDetailId;
@@ -17,14 +55,6 @@ public class ProjectDetail extends Projects {
 
     public void setProjectMemberDetailId(int projectMemberDetailId) {
         this.projectMemberDetailId = projectMemberDetailId;
-    }
-
-    public float getcTC() {
-        return cTC;
-    }
-
-    public void setcTC(float cTC) {
-        this.cTC = cTC;
     }
 
     public long getEmployeeId() {
@@ -136,32 +166,4 @@ public class ProjectDetail extends Projects {
 //    String projectName;
 //    @JsonProperty("ProjectDescription")
 //    String projectDescription;
-    @JsonProperty("CTC")
-    float cTC;
-    @JsonProperty("EmployeeId")
-    long employeeId;
-    @JsonProperty("DesignationId")
-    int designationId;
-    @JsonProperty("FullName")
-    String fullName;
-    @JsonProperty("Email")
-    String email;
-    @JsonProperty("IsActive")
-    boolean isActive;
-    @JsonProperty("AssignedOn")
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
-    Date assignedOn;
-    @JsonProperty("LastDateOnProject")
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
-    Date lastDateOnProject;
-    @JsonProperty("DesignationName")
-    String designationName;
-    @JsonProperty("ProjectManagerId")
-    long projectManagerId;
-    @JsonProperty("Team")
-    String team;
-    @JsonProperty("MemberType")
-    int memberType;
-    @JsonProperty("TeamMembers")
-    List<ProjectMembers> teamMembers;
 }
