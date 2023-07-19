@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    active: default
+    active: ${profile:prod}
   application:
     name: employee-project-service
 
@@ -11,42 +11,6 @@ spring:
     kubernetes:
       discovery:
         all-namespaces: true
-
-
-
----
-spring:
-  config:
-    activate:
-      on-profile: default
-    import: optional:configserver:http://localhost:8083
-
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.0.101:3306/onlinedatabuilder
-    username: istiyak
-    password: live@Bottomhalf_001
-
-eureka:
-  client:
-    enabled: false
-
----
-spring:
-  config:
-    activate:
-      on-profile: dev
-    import: optional:configserver:http://configserver-service:8083
-
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://194.233.76.48:3306/onlinedatabuilder
-    username: istiyak
-    password: live@Bottomhalf_011
-
-eureka:
-  client:
-    enabled: false
 
 ---
 

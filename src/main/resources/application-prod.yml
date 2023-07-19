@@ -1,0 +1,16 @@
+env:
+  folder: production-environment
+
+spring:
+  config:
+    import: optional:configserver:http://configserver-service:8083
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://194.233.76.48:3306/onlinedatabuilder
+    username: istiyak
+    password: live@Bottomhalf_011
+
+eureka:
+  client:
+    enabled: false
