@@ -237,7 +237,9 @@ public class ProjectService implements IProjectService {
             throw new Exception("Same employee found in multiple teams.");
 
         ProjectMembers projectMember = projectMemberRepository.getLastProjectMembersRecordId();
-        int lastId = projectMember.getProjectMemberDetailId();
+        int lastId = 0;
+        if (projectMember != null)
+            lastId = projectMember.getProjectMemberDetailId();
 
         Date utilDate = new Date();
         var date = new Timestamp(utilDate.getTime());
