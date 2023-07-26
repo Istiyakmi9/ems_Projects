@@ -41,6 +41,9 @@ public class ProjectDetail extends Projects {
     @JsonProperty("ExprienceInYear")
     BigDecimal exprienceInYear;
 
+    @JsonProperty("CompanyId")
+    int companyId;
+
     public BigDecimal getExprienceInYear() {
         return exprienceInYear;
     }
