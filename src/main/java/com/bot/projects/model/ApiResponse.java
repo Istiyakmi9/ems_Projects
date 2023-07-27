@@ -36,6 +36,14 @@ public class ApiResponse {
         return response;
     }
 
+    public static ApiResponse BadRequest(Object data) {
+        ApiResponse response = new ApiResponse();
+        response.setResponseBody(data);
+        response.setHttpStatusCode(HttpStatus.BAD_REQUEST.value());
+        response.setHttpStatusMessage("error");
+        return response;
+    }
+
     public String getAuthenticationToken() {
         return authenticationToken;
     }
