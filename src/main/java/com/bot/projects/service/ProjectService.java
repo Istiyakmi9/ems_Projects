@@ -176,6 +176,11 @@ public class ProjectService implements IProjectService {
         }
 
         var updatedMemberList = updateProjectMembersService(projects.getTeamMembers(), projectsRecords.getProjectId());
+        if (projectId > 0) {
+            updatedMemberList.forEach(x -> {
+                x.setProjectManagerId(projects.getProjectManagerId());
+            });
+        }
         projectMemberRepository.saveAll(updatedMemberList);
         return projectsRecords.getProjectId();
     }
