@@ -137,7 +137,7 @@ public class ProjectService implements IProjectService {
 
 
     public Map<String, Object> addUpdateProjectService(int projectId, Projects projects) throws Exception {
-        manageProject(projectId, projects);
+        projectId = manageProject(projectId, projects);
         return getProjectDetailService(projectId);
     }
 
@@ -167,18 +167,17 @@ public class ProjectService implements IProjectService {
         return map;
     }
     @Transactional(rollbackOn = Exception.class)
-    private void manageProject(int projectId, Projects projects) throws Exception {
+    private int manageProject(int projectId, Projects projects) throws Exception {
         Projects projectsRecords;
         if (projectId == 0) {
             projectsRecords = addProjectService(projects);
         } else {
             projectsRecords = updateProjectService(projects, projectId);
         }
-        if (projectId == 0)
-            projectId = projectsRecords.getProjectId();
 
         var updatedMemberList = updateProjectMembersService(projects.getTeamMembers(), projectsRecords.getProjectId());
         projectMemberRepository.saveAll(updatedMemberList);
+        return projectsRecords.getProjectId();
     }
 
     private void deactivateTeam(List<ProjectMembers> oldTeam, List<ProjectMembers> newTeam) {
@@ -204,10 +203,10 @@ public class ProjectService implements IProjectService {
                     && i.getTeam().equals(members.getTeam())).findFirst();
             if (current.isPresent()) {
                 var member = current.get();
-                member.setMemberType(members.getMemberType());
-                member.setGrade(members.getGrade());
-                member.setActive(true);
-                currentTeamMembers.add((member));
+                members.setMemberType(member.getMemberType());
+                members.setGrade(member.getGrade());
+                members.setActive(true);
+                currentTeamMembers.add((members));
             } else {
                 members.setActive(false);
                 members.setLastDateOnProject(date);
