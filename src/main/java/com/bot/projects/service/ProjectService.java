@@ -6,7 +6,6 @@ import com.bot.projects.model.*;
 import com.bot.projects.entity.Projects;
 import com.bot.projects.repository.ProjectRepository;
 import com.bot.projects.serviceinterface.IProjectService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
