@@ -1,24 +1,16 @@
 package com.bot.projects.service;
 
-import com.bot.projects.entity.ProjectAppraisal;
+import com.bot.projects.db.service.DbManager;
 import com.bot.projects.entity.ProjectMembers;
-import com.bot.projects.model.ClientDetail;
-import com.bot.projects.model.CurrentSession;
-import com.bot.projects.model.DbParameters;
+import com.bot.projects.model.*;
 import com.bot.projects.entity.Projects;
-import com.bot.projects.model.ProjectDetail;
-import com.bot.projects.repository.LowLevelExecution;
-import com.bot.projects.repository.ProjectMemberRepository;
 import com.bot.projects.repository.ProjectRepository;
 import com.bot.projects.serviceinterface.IProjectService;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-import java.sql.Types;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,47 +18,25 @@ import java.util.stream.Collectors;
 public class ProjectService implements IProjectService {
 
     @Autowired
-    LowLevelExecution lowLevelExecution;
-    @Autowired
-    ObjectMapper objectMapper;
-
+    CurrentSession currentSession;
     @Autowired
     ProjectRepository projectRepository;
-
     @Autowired
-    ProjectMemberRepository projectMemberRepository;
-    @Autowired
-    CurrentSession currentSession;
+    DbManager dbManager;
 
     @Override
     public Map<String, Object> getMembersDetailService(Long employeeId) throws Exception {
         if (employeeId == 0)
             throw new Exception("Invalid user id. Please login again");
 
-        List<DbParameters> dbParameters = new ArrayList<>();
-        dbParameters.add(new DbParameters("_EmployeeId", employeeId, Types.BIGINT));
-        var dataSet = lowLevelExecution.executeProcedure("sp_project_member_get_projects", dbParameters);
-        var project = objectMapper.convertValue(dataSet.get("#result-set-1"), new TypeReference<List<ProjectDetail>>() {
-        });
-        var projectAppraisal = objectMapper.convertValue(dataSet.get("#result-set-2"), new TypeReference<List<ProjectAppraisal>>() {
-        });
-
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("Project", project);
-        responseBody.put("ProjectAppraisal", projectAppraisal);
-        return responseBody;
+        return projectRepository.getMembersDetailRepository(employeeId);
     }
 
     public List<ProjectDetail> getProjectService(Long managerId) throws Exception {
         if (managerId == 0)
             throw new Exception("Invalid user id. Please login again");
 
-        List<DbParameters> dbParameters = new ArrayList<>();
-        dbParameters.add(new DbParameters("_EmployeeId", managerId, Types.BIGINT));
-        dbParameters.add(new DbParameters("_DesignationId", 2, Types.INTEGER));
-        var dataSet = lowLevelExecution.executeProcedure("sp_project_members_get_by_employee", dbParameters);
-        var result = objectMapper.convertValue(dataSet.get("#result-set-1"), new TypeReference<List<ProjectDetail>>() {
-        });
+        var result = projectRepository.getProjectRepository(managerId);
         return filterProjectByTeam(result, managerId);
     }
 
@@ -98,16 +68,14 @@ public class ProjectService implements IProjectService {
     private Projects addProjectService(Projects projects) throws Exception {
         java.util.Date utilDate = new java.util.Date();
         var date = new java.sql.Timestamp(utilDate.getTime());
-        Projects lastProjectRecord = projectRepository.getLastProjectRecordId();
-        if (lastProjectRecord != null)
-            projects.setProjectId(lastProjectRecord.getProjectId() + 1);
-        else
-            projects.setProjectId(1);
+        int lastProjectRecordId = dbManager.nextIntPrimaryKey(Projects.class);
+        projects.setProjectId(lastProjectRecordId);
         projects.setCreatedOn(date);
         projects.setUpdatedOn(date);
         projects.setCreatedBy(currentSession.getUserDetail().getUserId());
         projects.setUpdatedBy(currentSession.getUserDetail().getUserId());
-        return projectRepository.save(projects);
+        dbManager.save(projects);
+        return projects;
     }
 
     private Projects updateProjectService(Projects projects, int projectId) throws Exception {
@@ -116,10 +84,10 @@ public class ProjectService implements IProjectService {
 
         java.util.Date utilDate = new java.util.Date();
         var date = new java.sql.Timestamp(utilDate.getTime());
-        Optional<Projects> resultData = projectRepository.findById(projectId);
-        if (resultData.isEmpty())
+        Projects result = dbManager.getById(projectId, Projects.class);
+        if (result == null)
             throw new Exception("Project detail not found.");
-        Projects result = resultData.get();
+
         result.setProjectName(projects.getProjectName());
         result.setProjectDescription(projects.getProjectDescription());
         result.setHomePageUrl(projects.getHomePageUrl());
@@ -132,7 +100,8 @@ public class ProjectService implements IProjectService {
         result.setUpdatedOn(date);
         result.setCreatedBy(currentSession.getUserDetail().getUserId());
         result.setUpdatedBy(currentSession.getUserDetail().getUserId());
-        return projectRepository.save(result);
+        dbManager.save(result);
+        return result;
     }
 
 
@@ -142,31 +111,14 @@ public class ProjectService implements IProjectService {
     }
 
     public Map<String, Object> getProjectDetailService(int projectId) throws Exception {
-        List<DbParameters> dbParameters = new ArrayList<>();
-        dbParameters.add(new DbParameters("_ProjectId", projectId, Types.BIGINT));
-        var resultSet = lowLevelExecution.executeProcedure("sp_project_get_page_data", dbParameters);
-
-        var result = objectMapper.convertValue(resultSet.get("#result-set-1"), new TypeReference<List<Projects>>() {});
-        var clients = objectMapper.convertValue(resultSet.get("#result-set-2"), new TypeReference<List<ClientDetail>>() {});
-
-        Map<String, List<ProjectMembers>> membersCollection = new HashMap<>();
-        var members = objectMapper.convertValue(resultSet.get("#result-set-3"), new TypeReference<List<ProjectMembers>>() {});
-        if (members != null && members.size() > 0) {
-            membersCollection = members.stream().collect(
-                    Collectors.groupingBy(
-                            ProjectMembers::getTeam
-                    )
-            );
+        if(projectId == 0) {
+            throw new Exception("Invalid project id used.");
         }
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("Project", result);
-        map.put("Members", membersCollection);
-        map.put("Clients", clients);
-
-        return map;
+        return projectRepository.getProjectDetailRepository(projectId);
     }
-    @Transactional(rollbackOn = Exception.class)
+
+    @Transactional
     private int manageProject(int projectId, Projects projects) throws Exception {
         Projects projectsRecords;
         if (projectId == 0) {
@@ -175,8 +127,10 @@ public class ProjectService implements IProjectService {
             projectsRecords = updateProjectService(projects, projectId);
         }
 
-        var updatedMemberList = updateProjectMembersService(projects.getTeamMembers(), projectsRecords.getProjectId());
-        projectMemberRepository.saveAll(updatedMemberList);
+        if (projects.getTeamMembers().size() > 0) {
+            var updatedMemberList = updateProjectMembersService(projects.getTeamMembers(), projectsRecords.getProjectId());
+            dbManager.saveAll(updatedMemberList, ProjectMembers.class);
+        }
         return projectsRecords.getProjectId();
     }
 
@@ -197,20 +151,21 @@ public class ProjectService implements IProjectService {
     private int addUpdateMembers(List<ProjectMembers> oldTeam, List<ProjectMembers> newTeam, List<ProjectMembers> currentTeamMembers, int id) {
         java.util.Date utilDate = new java.util.Date();
         var date = new java.sql.Timestamp(utilDate.getTime());
-
-        for (ProjectMembers members : oldTeam) {
-            var current = newTeam.stream().filter(i -> i.getProjectMemberDetailId() == members.getProjectMemberDetailId()
-                    && i.getTeam().equals(members.getTeam())).findFirst();
-            if (current.isPresent()) {
-                var member = current.get();
-                members.setMemberType(member.getMemberType());
-                members.setGrade(member.getGrade());
-                members.setActive(true);
-                currentTeamMembers.add((members));
-            } else {
-                members.setActive(false);
-                members.setLastDateOnProject(date);
-                currentTeamMembers.add(members);
+        if (oldTeam.size() > 0) {
+            for (ProjectMembers members : oldTeam) {
+                var current = newTeam.stream().filter(i -> i.getProjectMemberDetailId() == members.getProjectMemberDetailId()
+                        && i.getTeam().equals(members.getTeam())).findFirst();
+                if (current.isPresent()) {
+                    var member = current.get();
+                    members.setMemberType(member.getMemberType());
+                    members.setGrade(member.getGrade());
+                    members.setActive(true);
+                    currentTeamMembers.add((members));
+                } else {
+                    members.setActive(false);
+                    members.setLastDateOnProject(date);
+                    currentTeamMembers.add(members);
+                }
             }
         }
 
@@ -235,18 +190,10 @@ public class ProjectService implements IProjectService {
         if (validateMemberInMultiTeam(projectMembers))
             throw new Exception("Same employee found in multiple teams.");
 
-        ProjectMembers projectMember = projectMemberRepository.getLastProjectMembersRecordId();
-        int lastId = 0;
-        if (projectMember != null)
-            lastId = projectMember.getProjectMemberDetailId();
-
-        Date utilDate = new Date();
-        var date = new Timestamp(utilDate.getTime());
+        int lastId = dbManager.nextIntPrimaryKey(ProjectMembers.class);
+        var teamMembers = projectRepository.getProjectMembersRepository(projectId);
 
         List<ProjectMembers> currentTeamMembers = new ArrayList<>();
-
-        List<ProjectMembers> teamMembers = projectMemberRepository.getProjectMemberByProjectId(projectId);
-
         List<ProjectMembers> existingMembers = projectMembers.stream()
                 .filter(x -> teamMembers.stream().anyMatch(i -> i.getTeam().equals(x.getTeam())))
                 .toList();

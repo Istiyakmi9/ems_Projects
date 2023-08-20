@@ -1,5 +1,6 @@
 package com.bot.projects.model;
 
+import com.bot.projects.db.annotations.Transient;
 import com.bot.projects.entity.ProjectMembers;
 import com.bot.projects.entity.Projects;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -23,10 +24,10 @@ public class ProjectDetail extends Projects {
     @JsonProperty("IsActive")
     boolean isActive;
     @JsonProperty("AssignedOn")
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     Date assignedOn;
     @JsonProperty("LastDateOnProject")
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     Date lastDateOnProject;
     @JsonProperty("DesignationName")
     String designationName;
@@ -156,17 +157,17 @@ public class ProjectDetail extends Projects {
         this.teamMembers = teamMembers;
     }
 
-    //    @Transient
-//    @JsonProperty("ProjectId")
-//    int projectId;
-//    @JsonProperty("ProjectStartedOn")
-//    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
-//    Date projectStartedOn;
-//    @JsonProperty("ProjectEndedOn")
-//    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
-//    Date projectEndedOn;
-//    @JsonProperty("ProjectName")
-//    String projectName;
-//    @JsonProperty("ProjectDescription")
-//    String projectDescription;
+    @Transient
+    @JsonProperty("ProjectId")
+    int projectId;
+    @JsonProperty("ProjectStartedOn")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    Date projectStartedOn;
+    @JsonProperty("ProjectEndedOn")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    Date projectEndedOn;
+    @JsonProperty("ProjectName")
+    String projectName;
+    @JsonProperty("ProjectDescription")
+    String projectDescription;
 }

@@ -1,9 +1,7 @@
 package com.bot.projects.controller;
 
-import com.bot.projects.entity.ProjectMembers;
 import com.bot.projects.entity.Projects;
 import com.bot.projects.model.ApiResponse;
-import com.bot.projects.model.ProjectDetail;
 import com.bot.projects.serviceinterface.IProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +14,7 @@ import java.util.List;
 public class ProjectController {
     @Autowired
     IProjectService iProjectService;
+
     @RequestMapping(value = "memberdetail/{employeeId}", method = RequestMethod.GET)
     public ResponseEntity<ApiResponse> getMembersDetail(@PathVariable long employeeId) throws Exception {
         var result = iProjectService.getMembersDetailService(employeeId);

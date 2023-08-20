@@ -1,11 +1,28 @@
 package com.bot.projects.repository;
 
+import com.bot.projects.db.utils.LowLevelExecution;
 import com.bot.projects.entity.ProjectAppraisal;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import com.bot.projects.model.DbParameters;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
+
 @Repository
-public interface ProjectAppraisalRepository extends JpaRepository<ProjectAppraisal, Integer> {
-    @Query(nativeQuery = true, value = "select p.* from project_appraisal p order by p.ProjectAppraisalId desc limit 1")
-    ProjectAppraisal getLastProjectAppraisal();
+public class ProjectAppraisalRepository {
+    @Autowired
+    LowLevelExecution lowLevelExecution;
+    @Autowired
+    ObjectMapper objectMapper;
+    public List<ProjectAppraisal> getProjectAppraisalRepository(int projectId) {
+        List<DbParameters> dbParameters = new ArrayList<>();
+        dbParameters.add(new DbParameters("_ProjectId", projectId, Types.BIGINT));
+        var dataSet = lowLevelExecution.executeProcedure("sp_project_appraisal_get_by_project", dbParameters);
+        return objectMapper.convertValue(dataSet.get("#result-set-1"), new TypeReference<List<ProjectAppraisal>>() {
+        });
+    }
 }

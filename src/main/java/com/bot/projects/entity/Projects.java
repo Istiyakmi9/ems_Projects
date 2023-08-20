@@ -1,26 +1,26 @@
 package com.bot.projects.entity;
 
+import com.bot.projects.db.annotations.Column;
+import com.bot.projects.db.annotations.Id;
+import com.bot.projects.db.annotations.Table;
+import com.bot.projects.db.annotations.Transient;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-@Entity
 @Table(name = "project")
 @Data
-@NoArgsConstructor
 public class Projects {
-    @Id
+    @Id()
     @Column(name = "ProjectId")
-    @JsonProperty("ProjectId")
+    @JsonProperty(value = "ProjectId")
     int projectId;
     @Column(name = "ProjectName")
-    @JsonProperty("ProjectName")
+    @JsonProperty(value = "ProjectName")
     String projectName;
     @Column(name = "ProjectDescription")
     @JsonProperty("ProjectDescription")
@@ -71,6 +71,9 @@ public class Projects {
     @JsonProperty("UpdatedOn")
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     Date updatedOn;
+    @JsonProperty("ProjectManagerId")
+    @Column(name = "ProjectManagerId")
+    long projectManagerId;
     @Transient
     @JsonProperty("CTC")
     BigDecimal cTC;
@@ -100,8 +103,6 @@ public class Projects {
     @Transient
     @JsonProperty("DesignationName")
     String designationName;
-    @JsonProperty("ProjectManagerId")
-    long projectManagerId;
     @Transient
     @JsonProperty("Team")
     String team;

@@ -1,23 +1,22 @@
 package com.bot.projects.entity;
 
+import com.bot.projects.db.annotations.Column;
+import com.bot.projects.db.annotations.Id;
+import com.bot.projects.db.annotations.Table;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
-@Entity(name = "project_members_detail")
+@Table(name = "project_members_detail")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProjectMembers {
-    @Id
+    @Id()
     @Column(name = "ProjectMemberDetailId")
     @JsonProperty("ProjectMemberDetailId")
     int projectMemberDetailId;

@@ -1,14 +1,16 @@
 package com.bot.projects.entity;
 
+import com.bot.projects.db.annotations.Column;
+import com.bot.projects.db.annotations.Id;
+import com.bot.projects.db.annotations.Table;
+import com.bot.projects.db.annotations.Transient;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
-@Entity
 @Table(name = "project_appraisal")
 @Data
 @NoArgsConstructor
