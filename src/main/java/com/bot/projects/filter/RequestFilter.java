@@ -49,9 +49,10 @@ public class RequestFilter implements Filter {
 
             String sid = claims.get("sid", String.class);
             String user = claims.get("JBot", String.class);
+            var roleName = claims.get("role", String.class);
+
             var userData = objectMapper.readValue(user, UserDetail.class);
             userDetail.setUserDetail(userData);
-            var roleName = claims.get("role", String.class);
             switch (roleName) {
                 case "Admin":
                     userDetail.getUserDetail().setRoleId(1);
@@ -76,9 +77,6 @@ public class RequestFilter implements Filter {
             if (userDetail.getUserDetail().getOrganizationId() <= 0
                     || userDetail.getUserDetail().getCompanyId() <= 0)
                 throw new Exception("Invalid Organization id or Company id. Please contact to admin.");
-
-            if (sid == null)
-                throw new Exception("Invalid employee id used. Please contact to admin.");
 
             userDetail.getUserDetail().setFullName(userDetail.getUserDetail().getFirstName() + " " +
                                                     userDetail.getUserDetail().getLastName());
