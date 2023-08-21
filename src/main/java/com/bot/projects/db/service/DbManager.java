@@ -55,9 +55,13 @@ public class DbManager {
     public <T> long nextLongPrimaryKey(Class<T> instance) throws Exception {
         long index = 0;
         String lastIndexQuery = dbUtils.lastPrimaryKey(instance);
-        String lastIndex = jdbcTemplate.queryForObject(lastIndexQuery, String.class);
-        if (lastIndex != null && !lastIndex.isEmpty()) {
-            index = Long.parseLong(lastIndex);
+        try {
+            String lastIndex = jdbcTemplate.queryForObject(lastIndexQuery, String.class);
+            if (lastIndex != null && !lastIndex.isEmpty()) {
+                index = Integer.parseInt(lastIndex);
+            }
+        } catch (EmptyResultDataAccessException e) {
+            index = 0;
         }
 
         return index + 1;
