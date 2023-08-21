@@ -110,10 +110,6 @@ public class ProjectService implements IProjectService {
     }
 
     public Map<String, Object> getProjectDetailService(int projectId) throws Exception {
-        if(projectId == 0) {
-            throw new Exception("Invalid project id used.");
-        }
-
         return projectRepository.getProjectDetailRepository(projectId);
     }
 
