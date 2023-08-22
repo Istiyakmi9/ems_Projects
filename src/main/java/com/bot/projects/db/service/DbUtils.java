@@ -1,19 +1,18 @@
 package com.bot.projects.db.service;
 
-
 import com.bot.projects.db.annotations.Column;
 import com.bot.projects.db.annotations.Id;
 import com.bot.projects.db.annotations.Table;
-import com.thoughtworks.xstream.core.util.Fields;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Component
+@RequestScope
 public class DbUtils {
     public <T> String save(T instance) throws Exception {
         String tableName = getTableName(instance);
