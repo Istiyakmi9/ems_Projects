@@ -18,29 +18,34 @@ import java.util.Map;
 @RequestScope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class LowLevelExecution {
     @Autowired
-    DatabaseConfiguration databaseConfiguration;
-    private JdbcTemplate jdbcTemplate;
-
-    @PostConstruct
-    private void setUpJdbc() {
+    LowLevelExecution(DatabaseConfiguration databaseConfiguration) {
         Template template = new Template();
         jdbcTemplate = template.getTemplate(databaseConfiguration);
     }
 
-    public <T> Map<String, Object> executeProcedure(String procedureName, List<DbParameters> sqlParams) {
+    @Autowired
+    DatabaseConfiguration databaseConfiguration;
+    private final JdbcTemplate jdbcTemplate;
+
+    public <T> Map<String, Object> executeProcedure(String procedureName, List<DbParameters> sqlParams) throws Exception {
         SimpleJdbcCall simpleJdbcCall = new SimpleJdbcCall(jdbcTemplate)
+                .withCatalogName(databaseConfiguration.getDatabase())
                 .withProcedureName(procedureName);
 
         Map<String, Object> paramSet = new HashMap<>();
-        for (DbParameters dbParameters : sqlParams) {
-            paramSet.put(dbParameters.parameter, dbParameters.value);
-            simpleJdbcCall.addDeclaredParameter(
-                    new SqlParameter(
-                            dbParameters.parameter,
-                            dbParameters.type
-                    ));
-        }
+        try {
+            for (DbParameters dbParameters : sqlParams) {
+                paramSet.put(dbParameters.parameter, dbParameters.value);
+                simpleJdbcCall.addDeclaredParameter(
+                        new SqlParameter(
+                                dbParameters.parameter,
+                                dbParameters.type
+                        ));
+            }
 
-        return simpleJdbcCall.execute(paramSet);
+            return simpleJdbcCall.execute(paramSet);
+        } catch (Exception e) {
+            throw new Exception(e);
+        }
     }
 }

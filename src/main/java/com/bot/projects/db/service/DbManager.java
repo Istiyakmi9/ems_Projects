@@ -5,6 +5,7 @@ import com.bot.projects.db.utils.Template;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -15,23 +16,18 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-@RequestScope
+@RequestScope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class DbManager {
     @Autowired
     DbUtils dbUtils;
     @Autowired
     ObjectMapper mapper;
-    @Autowired
-    DatabaseConfiguration databaseConfiguration;
-
     private JdbcTemplate jdbcTemplate;
-
-    @PostConstruct
-    private void setUpJdbc() {
+    @Autowired
+    DbManager(DatabaseConfiguration databaseConfiguration) {
         Template template = new Template();
         jdbcTemplate = template.getTemplate(databaseConfiguration);
     }
-
 
     public <T> void save(T instance) throws Exception {
         String query = dbUtils.save(instance);

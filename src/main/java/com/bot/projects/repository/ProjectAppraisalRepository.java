@@ -18,7 +18,7 @@ public class ProjectAppraisalRepository {
     LowLevelExecution lowLevelExecution;
     @Autowired
     ObjectMapper objectMapper;
-    public List<ProjectAppraisal> getProjectAppraisalRepository(int projectId) {
+    public List<ProjectAppraisal> getProjectAppraisalRepository(int projectId) throws Exception {
         List<DbParameters> dbParameters = new ArrayList<>();
         dbParameters.add(new DbParameters("_ProjectId", projectId, Types.BIGINT));
         var dataSet = lowLevelExecution.executeProcedure("sp_project_appraisal_get_by_project", dbParameters);
