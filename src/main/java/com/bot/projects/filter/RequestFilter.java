@@ -1,5 +1,6 @@
 package com.bot.projects.filter;
 
+import com.bot.projects.db.utils.DatabaseConfiguration;
 import com.bot.projects.model.CurrentSession;
 import com.bot.projects.model.UserDetail;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,56 +22,27 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 public class RequestFilter implements Filter {
-
     @Autowired
     CurrentSession userDetail;
+    @Autowired
+    DatabaseConfiguration databaseConfiguration;
     @Autowired
     ObjectMapper objectMapper;
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
-        String headerToken = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        if(headerToken == null || !headerToken.startsWith("Bearer")) {
-            // throw new RuntimeException("Invalid toke.");
-            filterChain.doFilter(servletRequest, servletResponse);
-            return;
-        }
-
-        headerToken = headerToken.substring(7);
         try {
-            String secret = "SchoolInMind_secret_key_is__bottomhalf@mi9_01";
-            byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
-            SecretKey key = Keys.hmacShaKeyFor(keyBytes);
-
-            Claims claims = Jwts.parser()
-                    .setSigningKey(key)
-                    .parseClaimsJws(headerToken)
-                    .getBody();
-
-            String sid = claims.get("sid", String.class);
-            String user = claims.get("JBot", String.class);
-            var roleName = claims.get("role", String.class);
-
-            var userData = objectMapper.readValue(user, UserDetail.class);
-            userDetail.setUserDetail(userData);
-            switch (roleName) {
-                case "Admin":
-                    userDetail.getUserDetail().setRoleId(1);
-                    break;
-                case "Employee":
-                    userDetail.getUserDetail().setRoleId(2);
-                    break;
-                case "Candidate":
-                    userDetail.getUserDetail().setRoleId(3);
-                    break;
-                case "Client":
-                    userDetail.getUserDetail().setRoleId(4);
-                    break;
-                default:
-                    userDetail.getUserDetail().setRoleId(5);
-                    break;
+            Object headerUserDetail = ((HttpServletRequest) servletRequest).getHeader("userDetail");
+            if(headerUserDetail == null || headerUserDetail.toString().isEmpty()) {
+                throw new Exception("Invalid token found. Please contact to admin.");
             }
 
+            Object database = ((HttpServletRequest) servletRequest).getHeader("database");
+            if(database == null || database.toString().isEmpty()) {
+                throw new Exception("Invalid company code found. Please contact to admin.");
+            }
+
+            var userData = objectMapper.readValue(headerUserDetail.toString(), UserDetail.class);
+            userDetail.setUserDetail(userData);
             if (userDetail.getUserDetail() == null)
                 throw new Exception("Invalid token found. Please contact to admin.");
 
@@ -78,9 +50,25 @@ public class RequestFilter implements Filter {
                     || userDetail.getUserDetail().getCompanyId() <= 0)
                 throw new Exception("Invalid Organization id or Company id. Please contact to admin.");
 
-            userDetail.getUserDetail().setFullName(userDetail.getUserDetail().getFirstName() + " " +
-                                                    userDetail.getUserDetail().getLastName());
-            userDetail.getUserDetail().setUserId(Long.parseLong(sid));
+            userDetail.getUserDetail().setUserId(userData.getUserId());
+
+            var dbResult = objectMapper.readValue(database.toString(), DatabaseConfiguration.class);
+            if(dbResult == null) {
+                throw new Exception("Invalid company code found. Please contact to admin.");
+            } else {
+                databaseConfiguration.setSchema(dbResult.getSchema());
+                databaseConfiguration.setDatabaseName(dbResult.getDatabaseName());
+                databaseConfiguration.setServer(dbResult.getServer());
+                databaseConfiguration.setPort(dbResult.getPort());
+                databaseConfiguration.setDatabase(dbResult.getDatabase());
+                databaseConfiguration.setUserId(dbResult.getUserId());
+                databaseConfiguration.setPassword(dbResult.getPassword());
+                databaseConfiguration.setConnectionTimeout(dbResult.getConnectionTimeout());
+                databaseConfiguration.setConnectionLifetime(dbResult.getConnectionLifetime());
+                databaseConfiguration.setPooling(dbResult.getPooling());
+                databaseConfiguration.setMinPoolSize(dbResult.getMinPoolSize());
+                databaseConfiguration.setMaxPoolSize(dbResult.getMaxPoolSize());
+            }
 
         } catch (ExpiredJwtException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Your session got expired");
