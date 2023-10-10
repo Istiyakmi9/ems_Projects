@@ -5,6 +5,7 @@ import com.bot.projects.db.utils.LowLevelExecution;
 import com.bot.projects.entity.ProjectAppraisal;
 import com.bot.projects.entity.ProjectMembers;
 import com.bot.projects.entity.Projects;
+import com.bot.projects.model.AppraisalReviewDetail;
 import com.bot.projects.model.ClientDetail;
 import com.bot.projects.model.DbParameters;
 import com.bot.projects.model.ProjectDetail;
@@ -43,10 +44,13 @@ public class ProjectRepository {
         });
         var projectAppraisal = objectMapper.convertValue(dataSet.get("#result-set-2"), new TypeReference<List<ProjectAppraisal>>() {
         });
+        var reviewDetail = objectMapper.convertValue(dataSet.get("#result-set-3"), new TypeReference<List<AppraisalReviewDetail>>() {
+        });
 
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("Project", project);
         responseBody.put("ProjectAppraisal", projectAppraisal);
+        responseBody.put("ReviewDetail", reviewDetail);
         return responseBody;
     }
 
