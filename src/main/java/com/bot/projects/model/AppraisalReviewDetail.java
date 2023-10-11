@@ -38,6 +38,4 @@ public class AppraisalReviewDetail {
     String comments;
     @JsonProperty("Rating")
     BigDecimal rating;
-    @JsonProperty("Reviewers")
-    String Reviewers;
 }
