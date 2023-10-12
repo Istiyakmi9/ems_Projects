@@ -15,9 +15,10 @@ public class ProjectController {
     @Autowired
     IProjectService iProjectService;
 
-    @RequestMapping(value = "memberdetail/{employeeId}", method = RequestMethod.GET)
-    public ResponseEntity<ApiResponse> getMembersDetail(@PathVariable long employeeId) throws Exception {
-        var result = iProjectService.getMembersDetailService(employeeId);
+    @RequestMapping(value = "memberdetail/{employeeId}/{projectId}", method = RequestMethod.GET)
+    public ResponseEntity<ApiResponse> getMembersDetail(@PathVariable long employeeId,
+                                                        @PathVariable int projectId) throws Exception {
+        var result = iProjectService.getMembersDetailService(employeeId, projectId);
         return ResponseEntity.ok(ApiResponse.Ok(result));
     }
 

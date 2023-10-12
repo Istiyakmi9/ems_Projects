@@ -24,11 +24,11 @@ public class ProjectService implements IProjectService {
     DbManager dbManager;
 
     @Override
-    public Map<String, Object> getMembersDetailService(Long employeeId) throws Exception {
+    public Map<String, Object> getMembersDetailService(Long employeeId, int projectId) throws Exception {
         if (employeeId == 0)
             throw new Exception("Invalid user id. Please login again");
 
-        return projectRepository.getMembersDetailRepository(employeeId);
+        return projectRepository.getMembersDetailRepository(employeeId, projectId);
     }
 
     public List<ProjectDetail> getProjectService(Long managerId) throws Exception {
@@ -41,24 +41,33 @@ public class ProjectService implements IProjectService {
 
     private List<ProjectDetail> filterProjectByTeam(List<ProjectDetail> projects, long managerId) {
         List<ProjectDetail> projectResults = new ArrayList<>();
-        for (Map.Entry<String, List<ProjectDetail>> entry : projects.stream()
+        for (Map.Entry<Integer, List<ProjectDetail>> entry : projects.stream()
                 .collect(
                         Collectors.groupingBy(
-                                ProjectDetail::getTeam,
+                                ProjectDetail::getProjectId,
                                 Collectors.toList()
                         )
                 ).entrySet()) {
 
             List<ProjectDetail> elem = entry.getValue();
-            Optional<ProjectDetail> current = elem.stream().filter(i -> i.getMemberType() == 2).findFirst();
-            if (current.isPresent()) {
-                if (current.get().getEmployeeId() == managerId) {
-                    current.get().setProjectManagerId(managerId);
-                    projectResults.add(current.get());
-                }
-            } else {
-                projectResults.add(elem.get(0));
-            }
+            Optional<ProjectDetail> project = elem.stream().findFirst();
+            if(project.isEmpty())
+                continue;
+
+            var result = elem.stream()
+                    .map(ProjectDetail::getTeam)
+                    .distinct()
+                    .collect(
+                            Collectors.joining(",")
+                    );
+
+            project.get().setTeam(result);
+            project.get().setFullName("");
+            project.get().setEmployeeId(0);
+            project.get().setDesignationId(0);
+            project.get().setMemberType(0);
+
+            projectResults.add(project.get());
         }
 
         return projectResults;

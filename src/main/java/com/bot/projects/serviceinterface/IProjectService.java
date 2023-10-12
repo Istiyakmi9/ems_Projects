@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface IProjectService {
-    Map<String, Object> getMembersDetailService(Long employeeId) throws Exception;
+    Map<String, Object> getMembersDetailService(Long employeeId, int projectId) throws Exception;
     List<ProjectDetail> getProjectService(Long managerId) throws Exception;
     Map<String, Object> addUpdateProjectService(int projectId, Projects projects) throws Exception;
     Map<String, Object> getProjectDetailService(int projectId) throws Exception;
