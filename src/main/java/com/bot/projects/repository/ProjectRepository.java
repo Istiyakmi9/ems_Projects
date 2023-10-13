@@ -36,9 +36,10 @@ public class ProjectRepository {
         return objectMapper.convertValue(dataSet.get("#result-set-1"), new TypeReference<List<ProjectDetail>>() {});
     }
 
-    public Map<String, Object> getMembersDetailRepository(Long employeeId) throws Exception {
+    public Map<String, Object> getMembersDetailRepository(Long employeeId, int projectId) throws Exception {
         List<DbParameters> dbParameters = new ArrayList<>();
         dbParameters.add(new DbParameters("_EmployeeId", employeeId, Types.BIGINT));
+        dbParameters.add(new DbParameters("_ProjectId", projectId, Types.INTEGER));
         var dataSet = lowLevelExecution.executeProcedure("sp_project_member_get_projects", dbParameters);
         var project = objectMapper.convertValue(dataSet.get("#result-set-1"), new TypeReference<List<ProjectDetail>>() {
         });
