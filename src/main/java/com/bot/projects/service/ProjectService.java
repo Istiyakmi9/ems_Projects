@@ -125,6 +125,16 @@ public class ProjectService implements IProjectService {
     @Transactional
     private int manageProject(int projectId, Projects projects) throws Exception {
         Projects projectsRecords;
+        var members = projects.getTeamMembers().stream().filter(x -> x.getMemberType() == 2).toList();
+        if (members.size() > 0) {
+            long projectManagerId = members.get(0).getEmployeeId();
+            if (projects.getProjectManagerId() != projectManagerId) {
+                projects.setProjectManagerId(projectManagerId);
+                projects.getTeamMembers().forEach(x -> {
+                    x.setProjectManagerId(projectManagerId);
+                });
+            }
+        }
         if (projectId == 0) {
             projectsRecords = addProjectService(projects);
         } else {
