@@ -38,4 +38,9 @@ public class AppraisalReviewDetail {
     String comments;
     @JsonProperty("Rating")
     BigDecimal rating;
+    @JsonProperty("ReactedOn")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    Date reactedOn;
+    @JsonProperty("Status")
+    int status;
 }
