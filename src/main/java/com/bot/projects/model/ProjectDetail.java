@@ -37,6 +37,19 @@ public class ProjectDetail extends Projects {
     String team;
     @JsonProperty("MemberType")
     int memberType;
+    @JsonProperty("Status")
+    int status;
+
+    public int getObjectiveCategoryId() {
+        return objectiveCategoryId;
+    }
+
+    public void setObjectiveCategoryId(int objectiveCategoryId) {
+        this.objectiveCategoryId = objectiveCategoryId;
+    }
+
+    @JsonProperty("ObjectiveCategoryId")
+    int objectiveCategoryId;
     @JsonProperty("TeamMembers")
     List<ProjectMembers> teamMembers;
     @JsonProperty("ExprienceInYear")

@@ -31,7 +31,6 @@ public class ProjectRepository {
     public List<ProjectDetail> getProjectRepository(Long managerId) throws Exception {
         List<DbParameters> dbParameters = new ArrayList<>();
         dbParameters.add(new DbParameters("_EmployeeId", managerId, Types.BIGINT));
-        dbParameters.add(new DbParameters("_DesignationId", 2, Types.INTEGER));
         var dataSet = lowLevelExecution.executeProcedure("sp_project_members_get_by_employee", dbParameters);
         return objectMapper.convertValue(dataSet.get("#result-set-1"), new TypeReference<List<ProjectDetail>>() {});
     }
