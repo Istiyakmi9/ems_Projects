@@ -57,6 +57,30 @@ public class Projects {
     @Column(name = "CompanyId")
     @JsonProperty("CompanyId")
     int companyId;
+    @Column(name = "CEOId")
+    @JsonProperty("CEOId")
+    Long cEOId;
+    @Column(name = "CFOId")
+    @JsonProperty("CFOId")
+    Long cFOId;
+    @Column(name = "CTOId")
+    @JsonProperty("CTOId")
+    Long cTOId;
+    @Column(name = "COOId")
+    @JsonProperty("COOId")
+    Long cOOId;
+    @Column(name = "CanCFOAccess")
+    @JsonProperty("CanCFOAccess")
+    Boolean canCFOAccess;
+    @Column(name = "CanCEOAccess")
+    @JsonProperty("CanCEOAccess")
+    Boolean canCEOAccess;
+    @Column(name = "CanCTOAccess")
+    @JsonProperty("CanCTOAccess")
+    Boolean canCTOAccess;
+    @Column(name = "CanCOOAccess")
+    @JsonProperty("CanCOOAccess")
+    Boolean canCOOAccess;
     @Column(name = "CreatedBy")
     @JsonProperty("CreatedBy")
     long createdBy;

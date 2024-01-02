@@ -5,10 +5,7 @@ import com.bot.projects.db.utils.LowLevelExecution;
 import com.bot.projects.entity.ProjectAppraisal;
 import com.bot.projects.entity.ProjectMembers;
 import com.bot.projects.entity.Projects;
-import com.bot.projects.model.AppraisalReviewDetail;
-import com.bot.projects.model.ClientDetail;
-import com.bot.projects.model.DbParameters;
-import com.bot.projects.model.ProjectDetail;
+import com.bot.projects.model.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,5 +86,12 @@ public class ProjectRepository {
         dbParameters.add(new DbParameters("_ProjectId", projectId, Types.BIGINT));
         var resultSet = lowLevelExecution.executeProcedure("sp_project_member_getby_projectid", dbParameters);
         return objectMapper.convertValue(resultSet.get("#result-set-1"), new TypeReference<List<ProjectMembers>>() { });
+    }
+
+    public List<OrgHierarchyModel> getHighHierarchy(int companyId) throws Exception {
+        List<DbParameters> dbParameters = new ArrayList<>();
+        dbParameters.add(new DbParameters("_CompanyId", companyId, Types.INTEGER));
+        var resultSet = lowLevelExecution.executeProcedure("sp_org_hierarchy_highlevel_byId", dbParameters);
+        return objectMapper.convertValue(resultSet.get("#result-set-1"), new TypeReference<List<OrgHierarchyModel>>() { });
     }
 }
