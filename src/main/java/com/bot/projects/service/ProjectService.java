@@ -36,7 +36,10 @@ public class ProjectService implements IProjectService {
             throw new Exception("Invalid user id. Please login again");
 
         var result = projectRepository.getProjectRepository(managerId);
-        return filterProjectByTeam(result, managerId);
+        if (result != null)
+            return filterProjectByTeam(result, managerId);
+        else
+            return  null;
     }
 
     private List<ProjectDetail> filterProjectByTeam(List<ProjectDetail> projects, long managerId) {
