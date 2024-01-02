@@ -2,15 +2,20 @@ package com.bot.projects.service;
 
 import com.bot.projects.db.service.DbManager;
 import com.bot.projects.entity.ProjectMembers;
-import com.bot.projects.model.*;
 import com.bot.projects.entity.Projects;
+import com.bot.projects.model.ApplicationConstant;
+import com.bot.projects.model.CurrentSession;
+import com.bot.projects.model.OrgHierarchyModel;
+import com.bot.projects.model.ProjectDetail;
 import com.bot.projects.repository.ProjectRepository;
 import com.bot.projects.serviceinterface.IProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -130,7 +135,6 @@ public class ProjectService implements IProjectService {
         return projectRepository.getProjectDetailRepository(projectId);
     }
 
-    @Transactional
     private int manageProject(int projectId, Projects projects) throws Exception {
         Projects projectsRecords;
         var members = projects.getTeamMembers().stream().filter(x -> x.getMemberType() == 2).toList();
