@@ -104,6 +104,14 @@ public class ProjectService implements IProjectService {
         result.setProjectStartedOn(projects.getProjectStartedOn());
         result.setProjectEndedOn(projects.getProjectEndedOn());
         result.setProjectManagerId(projects.getProjectManagerId());
+        result.setCEOId(projects.getCEOId());
+        result.setCanCEOAccess(projects.getCanCEOAccess());
+        result.setCTOId(projects.getCTOId());
+        result.setCanCTOAccess(projects.getCanCTOAccess());
+        result.setCFOId(projects.getCFOId());
+        result.setCanCFOAccess(projects.getCanCFOAccess());
+        result.setCOOId(projects.getCOOId());
+        result.setCanCOOAccess(projects.getCanCOOAccess());
         result.setCreatedOn(date);
         result.setUpdatedOn(date);
         result.setCreatedBy(currentSession.getUserDetail().getUserId());
@@ -135,17 +143,36 @@ public class ProjectService implements IProjectService {
                 });
             }
         }
-        if (projectId == 0) {
+
+        addHighHierarchy(projects);
+        if (projectId == 0)
             projectsRecords = addProjectService(projects);
-        } else {
+        else
             projectsRecords = updateProjectService(projects, projectId);
-        }
 
         if (projects.getTeamMembers().size() > 0) {
             var updatedMemberList = updateProjectMembersService(projects.getTeamMembers(), projectsRecords.getProjectId());
             dbManager.saveAll(updatedMemberList, ProjectMembers.class);
         }
         return projectsRecords.getProjectId();
+    }
+
+    private  void addHighHierarchy(Projects projects) throws Exception {
+        var highLevelHierarchy = projectRepository.getHighHierarchy(currentSession.getUserDetail().getCompanyId());
+        if (highLevelHierarchy != null && highLevelHierarchy.size() > 0) {
+            var cEOId = highLevelHierarchy.stream().filter(x -> x.getRoleName().equals(ApplicationConstant.CEO)).map(OrgHierarchyModel::getEmployeeId).findFirst().orElse(0L);
+            var cTOId = highLevelHierarchy.stream().filter(x -> x.getRoleName().equals(ApplicationConstant.CTO)).map(OrgHierarchyModel::getEmployeeId).findFirst().orElse(0L);
+            var cFOId = highLevelHierarchy.stream().filter(x -> x.getRoleName().equals(ApplicationConstant.CFO)).map(OrgHierarchyModel::getEmployeeId).findFirst().orElse(0L);
+            var cOOId = highLevelHierarchy.stream().filter(x -> x.getRoleName().equals(ApplicationConstant.COO)).map(OrgHierarchyModel::getEmployeeId).findFirst().orElse(0L);
+            projects.setCEOId(cEOId);
+            projects.setCanCEOAccess(true);
+            projects.setCTOId(cTOId);
+            projects.setCanCTOAccess(true);
+            projects.setCFOId(cFOId);
+            projects.setCanCFOAccess(true);
+            projects.setCOOId(cOOId);
+            projects.setCanCOOAccess(true);
+        }
     }
 
     private void deactivateTeam(List<ProjectMembers> oldTeam, List<ProjectMembers> newTeam) {
