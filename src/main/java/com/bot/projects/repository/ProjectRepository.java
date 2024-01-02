@@ -1,6 +1,5 @@
 package com.bot.projects.repository;
 
-import com.bot.projects.db.service.DbManager;
 import com.bot.projects.db.utils.LowLevelExecution;
 import com.bot.projects.entity.ProjectAppraisal;
 import com.bot.projects.entity.ProjectMembers;
@@ -11,9 +10,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
@@ -22,8 +23,6 @@ public class ProjectRepository {
     ObjectMapper objectMapper;
     @Autowired
     LowLevelExecution lowLevelExecution;
-    @Autowired
-    DbManager dbManager;
 
     public List<ProjectDetail> getProjectRepository(Long managerId) throws Exception {
         List<DbParameters> dbParameters = new ArrayList<>();
