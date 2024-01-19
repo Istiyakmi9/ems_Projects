@@ -43,4 +43,10 @@ public class AppraisalReviewDetail {
     Date reactedOn;
     @JsonProperty("Status")
     int status;
+    @JsonProperty("AppraisalStatus")
+    int appraisalStatus;
+    @JsonProperty("IsActive")
+    boolean isActive;
+    @JsonProperty("ApprovalLevel")
+    int approvalLevel;
 }
