@@ -206,7 +206,6 @@ public class ProjectService implements IProjectService {
                 if (current.isPresent()) {
                     var member = current.get();
                     members.setMemberType(member.getMemberType());
-                    members.setGrade(member.getGrade());
                     members.setActive(true);
                     currentTeamMembers.add((members));
                 } else {

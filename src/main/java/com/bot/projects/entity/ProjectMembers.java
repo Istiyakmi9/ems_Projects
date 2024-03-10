@@ -26,9 +26,6 @@ public class ProjectMembers {
     @Column(name = "EmployeeId")
     @JsonProperty("EmployeeId")
     long employeeId;
-    @Column(name = "DesignationId")
-    @JsonProperty("DesignationId")
-    int designationId;
     @Column(name = "FullName")
     @JsonProperty("FullName")
     String fullName;
@@ -38,9 +35,6 @@ public class ProjectMembers {
     @Column(name = "IsActive")
     @JsonProperty("IsActive")
     boolean isActive;
-    @Column(name = "Grade")
-    @JsonProperty("Grade")
-    String grade;
     @Column(name = "MemberType")
     @JsonProperty("MemberType")
     int memberType;
