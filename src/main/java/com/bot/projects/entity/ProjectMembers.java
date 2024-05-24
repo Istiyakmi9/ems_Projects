@@ -3,6 +3,7 @@ package com.bot.projects.entity;
 import com.bot.projects.db.annotations.Column;
 import com.bot.projects.db.annotations.Id;
 import com.bot.projects.db.annotations.Table;
+import com.bot.projects.db.annotations.Transient;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -52,4 +53,13 @@ public class ProjectMembers {
     @Column(name = "ProjectManagerId")
     @JsonProperty("ProjectManagerId")
     long projectManagerId;
+    @Transient
+    @JsonProperty("RoleName")
+    String roleName;
+    @Transient
+    @JsonProperty("FilePath")
+    String filePath;
+    @Transient
+    @JsonProperty("FileName")
+    String fileName;
 }

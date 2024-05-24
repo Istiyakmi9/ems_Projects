@@ -272,4 +272,11 @@ public class ProjectService implements IProjectService {
 
         return collect.size() > 0;
     }
+
+    public List<ProjectMembers> getProjectMembersService(int projectId) throws Exception {
+        if (projectId == 0)
+            throw new Exception("Invalid project selected");
+
+        return  projectRepository.getProjectMembersRepository(projectId);
+    }
 }

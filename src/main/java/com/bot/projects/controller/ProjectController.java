@@ -39,4 +39,10 @@ public class ProjectController {
         var result = iProjectService.getProjectDetailService(projectId);
         return ResponseEntity.ok(ApiResponse.Ok(result));
     }
+
+    @RequestMapping(value = "getProjectMemberDetail/{projectId}", method = RequestMethod.GET)
+    public ResponseEntity<ApiResponse> getProjectMemberDetail(@PathVariable int projectId) throws Exception {
+        var result = iProjectService.getProjectMembersService(projectId);
+        return ResponseEntity.ok(ApiResponse.Ok(result));
+    }
 }
