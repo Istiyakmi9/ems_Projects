@@ -21,45 +21,62 @@ public class ProjectMembers {
     @Column(name = "ProjectMemberDetailId")
     @JsonProperty("ProjectMemberDetailId")
     int projectMemberDetailId;
+
     @Column(name = "ProjectId")
     @JsonProperty("ProjectId")
     int projectId;
+
     @Column(name = "EmployeeId")
     @JsonProperty("EmployeeId")
     long employeeId;
+
     @Column(name = "FullName")
     @JsonProperty("FullName")
     String fullName;
+
     @Column(name = "Email")
     @JsonProperty("Email")
     String email;
+
     @Column(name = "IsActive")
     @JsonProperty("IsActive")
     boolean isActive;
+
     @Column(name = "MemberType")
     @JsonProperty("MemberType")
     int memberType;
+
     @Column(name = "AssignedOn")
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     @JsonProperty("AssignedOn")
     Date assignedOn;
+
     @Column(name = "LastDateOnProject")
     @JsonProperty("LastDateOnProject")
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     Date lastDateOnProject;
+
     @Column(name = "Team")
     @JsonProperty("Team")
     String team;
+
     @Column(name = "ProjectManagerId")
     @JsonProperty("ProjectManagerId")
     long projectManagerId;
+
     @Transient
     @JsonProperty("RoleName")
     String roleName;
+
     @Transient
     @JsonProperty("FilePath")
     String filePath;
+
     @Transient
     @JsonProperty("FileName")
     String fileName;
+
+    @Column(name = "AllocatedMinutes")
+    @JsonProperty("AllocatedMinutes")
+    int allocatedMinutes;
 }

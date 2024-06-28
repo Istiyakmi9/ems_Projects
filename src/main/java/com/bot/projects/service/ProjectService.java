@@ -3,10 +3,7 @@ package com.bot.projects.service;
 import com.bot.projects.db.service.DbManager;
 import com.bot.projects.entity.ProjectMembers;
 import com.bot.projects.entity.Projects;
-import com.bot.projects.model.ApplicationConstant;
-import com.bot.projects.model.CurrentSession;
-import com.bot.projects.model.OrgHierarchyModel;
-import com.bot.projects.model.ProjectDetail;
+import com.bot.projects.model.*;
 import com.bot.projects.repository.ProjectRepository;
 import com.bot.projects.serviceinterface.IProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +87,7 @@ public class ProjectService implements IProjectService {
         projects.setUpdatedOn(date);
         projects.setCreatedBy(currentSession.getUserDetail().getUserId());
         projects.setUpdatedBy(currentSession.getUserDetail().getUserId());
+        projects.setCEOId(1L);
         dbManager.save(projects);
         return projects;
     }
@@ -277,6 +275,10 @@ public class ProjectService implements IProjectService {
         if (projectId == 0)
             throw new Exception("Invalid project selected");
 
-        return  projectRepository.getProjectMembersRepository(projectId);
+        return projectRepository.getProjectMembersRepository(projectId);
+    }
+
+    public List<ProjectMembers> getProjectMemberByFilterService(FilterModel filterModel) throws Exception {
+        return projectRepository.getProjectMemberByFilterService(filterModel);
     }
 }
