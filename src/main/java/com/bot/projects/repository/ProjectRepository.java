@@ -97,13 +97,20 @@ public class ProjectRepository {
         return objectMapper.convertValue(resultSet.get("#result-set-1"), new TypeReference<List<OrgHierarchyModel>>() { });
     }
 
-    public  List<ProjectMembers> getProjectMemberByFilterService(FilterModel filterModel) throws Exception {
+    public  Map<String, Object> getProjectMemberByFilterService(FilterModel filterModel) throws Exception {
         List<DbParameters> dbParameters = new ArrayList<>();
         dbParameters.add(new DbParameters("_SearchString", filterModel.getSearchString(), Types.VARCHAR));
         dbParameters.add(new DbParameters("_SortBy", filterModel.getSearchString(), Types.VARCHAR));
         dbParameters.add(new DbParameters("_PageIndex", filterModel.getPageIndex(), Types.INTEGER));
         dbParameters.add(new DbParameters("_PageSize", filterModel.getPageSize(), Types.INTEGER));
         var resultSet = lowLevelExecution.executeProcedure("sp_project_member_getby_filter", dbParameters);
-        return objectMapper.convertValue(resultSet.get("#result-set-1"), new TypeReference<List<ProjectMembers>>() { });
+        var projectMembers = objectMapper.convertValue(resultSet.get("#result-set-1"), new TypeReference<List<ProjectMembers>>() { });
+        var workingShift = objectMapper.convertValue(resultSet.get("#result-set-2"), new TypeReference<List<WorkShift>>() { });
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("ProjectMember", projectMembers);
+        map.put("WorkingShift", workingShift);
+
+        return map;
     }
 }

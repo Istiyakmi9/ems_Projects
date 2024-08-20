@@ -278,7 +278,7 @@ public class ProjectService implements IProjectService {
         return projectRepository.getProjectMembersRepository(projectId);
     }
 
-    public List<ProjectMembers> getProjectMemberByFilterService(FilterModel filterModel) throws Exception {
+    public Map<String, Object> getProjectMemberByFilterService(FilterModel filterModel) throws Exception {
         return projectRepository.getProjectMemberByFilterService(filterModel);
     }
 }

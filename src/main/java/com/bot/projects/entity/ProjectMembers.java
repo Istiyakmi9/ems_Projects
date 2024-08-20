@@ -79,4 +79,16 @@ public class ProjectMembers {
     @Column(name = "AllocatedMinutes")
     @JsonProperty("AllocatedMinutes")
     int allocatedMinutes;
+
+    @Transient
+    @JsonProperty("WorkShiftId")
+    int workShiftId;
+
+    @Transient
+    @JsonProperty("ProjectName")
+    String projectName;
+
+    @Transient
+    @JsonProperty("Total")
+    int total;
 }
