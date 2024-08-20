@@ -14,5 +14,5 @@ public interface IProjectService {
     Map<String, Object> addUpdateProjectService(int projectId, Projects projects) throws Exception;
     Map<String, Object> getProjectDetailService(int projectId) throws Exception;
     List<ProjectMembers> getProjectMembersService(int projectId) throws Exception;
-    List<ProjectMembers> getProjectMemberByFilterService(FilterModel filterModel) throws Exception;
+    Map<String, Object> getProjectMemberByFilterService(FilterModel filterModel) throws Exception;
 }
