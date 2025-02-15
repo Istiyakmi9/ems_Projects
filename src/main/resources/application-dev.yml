@@ -5,8 +5,16 @@ spring:
   config:
     import: optional:configserver:http://localhost:8083
 
+file:
+  saver:
+    service:
+      url: http://localhost:5010/bt/s1/api/
+
 eureka:
   client:
     enabled: true
     serviceUrl:
       defaultZone: http://localhost:8080/eureka
+
+app:
+  resourceBaseUrl: "http://localhost:5000/bts/resources/"

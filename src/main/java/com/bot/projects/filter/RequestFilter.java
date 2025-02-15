@@ -44,7 +44,19 @@ public class RequestFilter implements Filter {
                 throw new Exception("Invalid Organization id or Company id. Please contact to admin.");
 
             userDetail.getUserDetail().setUserId(userData.getUserId());
+            userDetail.setLocalConnectionString(database.toString());
+            Object authorization = ((HttpServletRequest) servletRequest).getHeader("authorization");
+            if(authorization == null || authorization.toString().isEmpty()) {
+                throw new Exception("Invalid token found. Please contact to admin.");
+            }
 
+            Object companyCode = ((HttpServletRequest) servletRequest).getHeader("companyCode");
+            if(companyCode == null || companyCode.toString().isEmpty()) {
+                throw new Exception("Invalid company code found.");
+            }
+
+            userDetail.setAuthorization(authorization.toString());
+            userDetail.setCompanyCode(companyCode.toString());
             var dbResult = objectMapper.readValue(database.toString(), DatabaseConfiguration.class);
             if(dbResult == null) {
                 throw new Exception("Invalid company code found. Please contact to admin.");

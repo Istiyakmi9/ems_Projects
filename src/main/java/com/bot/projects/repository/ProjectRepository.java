@@ -3,6 +3,7 @@ package com.bot.projects.repository;
 import com.bot.projects.db.utils.LowLevelExecution;
 import com.bot.projects.entity.ProjectAppraisal;
 import com.bot.projects.entity.ProjectMembers;
+import com.bot.projects.entity.ProjectTeams;
 import com.bot.projects.entity.Projects;
 import com.bot.projects.model.*;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -10,6 +11,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,10 +26,14 @@ import java.util.stream.Collectors;
 
 @Repository
 public class ProjectRepository {
+    private final AppProperties _appProperties;
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
     LowLevelExecution lowLevelExecution;
+    public ProjectRepository(AppProperties appProperties) {
+        _appProperties = appProperties;
+    }
 
     public List<ProjectDetail> getProjectRepository(Long managerId) throws Exception {
         List<DbParameters> dbParameters = new ArrayList<>();
@@ -67,20 +78,47 @@ public class ProjectRepository {
         var members = objectMapper.convertValue(resultSet.get("#result-set-3"), new TypeReference<List<ProjectMembers>>() {
         });
 
-        if (members != null && members.size() > 0) {
-            membersCollection = members.stream().collect(
-                    Collectors.groupingBy(
-                            ProjectMembers::getTeam
-                    )
-            );
-        }
+        var teams = objectMapper.convertValue(resultSet.get("#result-set-4"), new TypeReference<List<ProjectTeams>>() {
+        });
 
+        Projects project = null;
+        if (result.size() == 1) {
+            project = result.get(0);
+            project.setProjectDescription(readTextFileContent(project.getProjectDescriptionFilePath()));
+        }
         Map<String, Object> map = new HashMap<>();
-        map.put("Project", result);
-        map.put("Members", membersCollection);
+        map.put("Project", project);
+        map.put("Members", members);
         map.put("Clients", clients);
+        map.put("Teams", teams);
 
         return map;
+    }
+
+    private String readTextFileContent(String filePath) throws Exception {
+        if (filePath.isEmpty() || filePath.isBlank())
+            throw new Exception("Invalid file path");
+
+        var url = _appProperties.getResourceBaseUrl() + filePath.replace("\\", "/");
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .build();
+
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(
+                        client.send(request, HttpResponse.BodyHandlers.ofInputStream()).body()))) {
+
+            StringBuilder content = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+
+            return content.toString();
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
     }
 
     public List<ProjectMembers> getProjectMembersRepository(int projectId) throws Exception {
