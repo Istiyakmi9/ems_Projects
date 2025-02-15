@@ -5,6 +5,14 @@ spring:
   config:
     import: optional:configserver:http://configserver-service:8083
 
+  file:
+    saver:
+      service:
+        url: http://bt-filemanager-service:5012/bt/s1/api/
+
 eureka:
   client:
     enabled: false
+
+app:
+  resourceBaseUrl: "https://www.bottomhalf.in/bts/resources/"

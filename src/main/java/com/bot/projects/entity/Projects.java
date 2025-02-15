@@ -22,9 +22,11 @@ public class Projects {
     @Column(name = "ProjectName")
     @JsonProperty(value = "ProjectName")
     String projectName;
-    @Column(name = "ProjectDescription")
-    @JsonProperty("ProjectDescription")
-    String projectDescription;
+
+    @Column(name="ProjectDescriptionFilePath")
+    @JsonProperty("ProjectDescriptionFilePath")
+    String projectDescriptionFilePath;
+
     @Column(name = "ProjectStartedOn")
     @JsonProperty("ProjectStartedOn")
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
@@ -98,6 +100,18 @@ public class Projects {
     @JsonProperty("ProjectManagerId")
     @Column(name = "ProjectManagerId")
     long projectManagerId;
+    @JsonProperty("Priority")
+    @Column(name = "Priority")
+    int priority;
+    @JsonProperty("Status")
+    @Column(name = "Status")
+    int status;
+    @JsonProperty("ThumbnailPath")
+    @Column(name = "ThumbnailPath")
+    String thumbnailPath;
+    @JsonProperty("AttachmentPath")
+    @Column(name = "AttachmentPath")
+    String attachmentPath;
     @Transient
     @JsonProperty("CTC")
     BigDecimal cTC;
@@ -136,4 +150,8 @@ public class Projects {
     @Transient
     @JsonProperty("TeamMembers")
     List<ProjectMembers> teamMembers;
+
+    @Transient
+    @JsonProperty("ProjectDescription")
+    String projectDescription;
 }
