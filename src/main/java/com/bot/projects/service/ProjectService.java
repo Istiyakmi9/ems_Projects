@@ -140,7 +140,7 @@ public class ProjectService implements IProjectService {
         return result;
     }
 
-
+    @Transactional(rollbackFor = Exception.class)
     public String addProjectDetailService(String data, MultipartFile[] attachment, MultipartFile thumbnail) throws Exception {
         Projects projectData = objectMapper.readValue(data, Projects.class);
         validateProjectDetail(projectData, thumbnail);

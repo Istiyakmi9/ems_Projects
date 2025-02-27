@@ -8,7 +8,7 @@ spring:
 file:
   saver:
     service:
-      url: http://bt-filemanager-service:5012/bt/s1/api/
+      url: http://bt-filemanager-service.ems.svc.cluster.local:8001/bt/s1/api/
 
 eureka:
   client:
