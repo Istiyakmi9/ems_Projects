@@ -97,7 +97,7 @@ public class ProjectRepository {
 
     private String readTextFileContent(String filePath) throws Exception {
         if (filePath.isEmpty() || filePath.isBlank())
-            throw new Exception("Invalid file path");
+            return "";
 
         var url = _appProperties.getResourceBaseUrl() + filePath.replace("\\", "/");
         HttpClient client = HttpClient.newHttpClient();
@@ -150,5 +150,13 @@ public class ProjectRepository {
         map.put("WorkingShift", workingShift);
 
         return map;
+    }
+
+    public void deleteTeamMemberFromDefaultProjectRepository(Long employeeId, int projectId) throws Exception {
+        List<DbParameters> dbParameters = new ArrayList<>();
+        dbParameters.add(new DbParameters("_EmployeeId", employeeId, Types.BIGINT));
+        dbParameters.add(new DbParameters("_ProjectId", projectId, Types.INTEGER));
+
+        lowLevelExecution.executeProcedure("sp_project_member_delete_by_empid", dbParameters);
     }
 }

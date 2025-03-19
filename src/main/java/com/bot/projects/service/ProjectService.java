@@ -494,6 +494,8 @@ public class ProjectService implements IProjectService {
             projectMember.setActive(true);
             projectMember.setProjectManagerId(0);
             projectMember.setAllocatedMinutes(0);
+
+            projectRepository.deleteTeamMemberFromDefaultProjectRepository(projectMember.getEmployeeId(), ApplicationConstant.DefaultProjectId);
         }
 
         dbManager.saveAll(projectMembers, ProjectMembers.class);
@@ -713,6 +715,7 @@ public class ProjectService implements IProjectService {
         return  filePath.replace("\\", "\\\\");
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public List<String> manageProjectTeamService(String teamName, int projectId) throws Exception {
         if (teamName == null || teamName.isEmpty())
             throw new Exception(("Invalid team name"));

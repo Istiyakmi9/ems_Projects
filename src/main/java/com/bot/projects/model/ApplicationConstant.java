@@ -7,4 +7,5 @@ public final class ApplicationConstant {
     public static final String COO = "COO";
     public static final String CHRO = "CHRO";
     public static final String EmstumFileService = "emstum";
+    public static final int DefaultProjectId = 1;
 }
