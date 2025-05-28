@@ -10,9 +10,9 @@ name: Java CI pipeline for Employee Project service
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: [ "emstum-prod" ]
+#  pull_request:
+#    branches: [ "emstum-prod" ]
 
 jobs:
   build:
@@ -34,7 +34,7 @@ jobs:
       name: Build & push Docker image
       with:
         image: istiyaqmi9/ems_projects
-        tags: latest
+        tags: emstum
         registry: docker.io
         dockerfile: Dockerfile
         username: ${{ secrets.DOCKER_USERNAME }}
