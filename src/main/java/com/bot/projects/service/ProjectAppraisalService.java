@@ -34,7 +34,7 @@ public class ProjectAppraisalService implements IProjectAppraisalService {
         projectAppraisal.setProjectAppraisalId(dbManager.nextIntPrimaryKey(ProjectAppraisal.class));
 
         projectAppraisal.setCreatedOn(date);
-        projectAppraisal.setCreatedBy(currentSession.getUserDetail().getUserId());
+        projectAppraisal.setCreatedBy(currentSession.getUserId());
         dbManager.save(projectAppraisal);
         return this.getProjectAppraisalService(projectAppraisal.getProjectId());
     }
@@ -51,7 +51,7 @@ public class ProjectAppraisalService implements IProjectAppraisalService {
         existProjectAppraisal.setToDate(projectAppraisal.getToDate());
         existProjectAppraisal.setProjectAppraisalBudget(projectAppraisal.getProjectAppraisalBudget());
         existProjectAppraisal.setUpdatedOn(date);
-        existProjectAppraisal.setUpdatedBy(currentSession.getUserDetail().getUserId());
+        existProjectAppraisal.setUpdatedBy(currentSession.getUserId());
         dbManager.save(existProjectAppraisal);
         return this.getProjectAppraisalService(projectAppraisal.getProjectId());
     }
