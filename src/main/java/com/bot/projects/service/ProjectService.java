@@ -95,8 +95,8 @@ public class ProjectService implements IProjectService {
             addHighHierarchy(projects);
             projects.setCreatedOn(date);
             projects.setUpdatedOn(date);
-            projects.setCreatedBy(currentSession.getUserDetail().getUserId());
-            projects.setUpdatedBy(currentSession.getUserDetail().getUserId());
+            projects.setCreatedBy(currentSession.getUserId());
+            projects.setUpdatedBy(currentSession.getUserId());
             projects.setCEOId(1L);
             dbManager.save(projects);
             return projects;
@@ -134,8 +134,8 @@ public class ProjectService implements IProjectService {
         result.setCanCOOAccess(projects.getCanCOOAccess());
         result.setCreatedOn(date);
         result.setUpdatedOn(date);
-        result.setCreatedBy(currentSession.getUserDetail().getUserId());
-        result.setUpdatedBy(currentSession.getUserDetail().getUserId());
+        result.setCreatedBy(currentSession.getUserId());
+        result.setUpdatedBy(currentSession.getUserId());
         dbManager.save(result);
         return result;
     }
@@ -270,7 +270,7 @@ public class ProjectService implements IProjectService {
     }
 
     private void addHighHierarchy(Projects projects) throws Exception {
-        var highLevelHierarchy = projectRepository.getHighHierarchy(currentSession.getUserDetail().getCompanyId());
+        var highLevelHierarchy = projectRepository.getHighHierarchy(currentSession.getCompanyId());
         if (highLevelHierarchy != null && highLevelHierarchy.size() > 0) {
             var cEOId = highLevelHierarchy.stream().filter(x -> x.getRoleName().equals(ApplicationConstant.CEO)).map(OrgHierarchyModel::getEmployeeId).findFirst().orElse(0L);
             var cTOId = highLevelHierarchy.stream().filter(x -> x.getRoleName().equals(ApplicationConstant.CTO)).map(OrgHierarchyModel::getEmployeeId).findFirst().orElse(0L);
@@ -668,7 +668,7 @@ public class ProjectService implements IProjectService {
         existingProject.setProjectStartedOn(projectData.getProjectStartedOn());
         existingProject.setProjectEndedOn(projectData.getProjectEndedOn());
         existingProject.setUpdatedOn(date);
-        existingProject.setUpdatedBy(currentSession.getUserDetail().getUserId());
+        existingProject.setUpdatedBy(currentSession.getUserId());
     }
 
     private void deleteFile(String oldFileName, int projectId) throws Exception {
@@ -776,7 +776,7 @@ public class ProjectService implements IProjectService {
                 .index(teamUpdatesDetails.size() + 1)
                 .teamName(teamName)
                 .membersId(membersId)
-                .modifiedBy(currentSession.getUserDetail().getUserId())
+                .modifiedBy(currentSession.getUserId())
                 .status(true)
                 .updatedOn(date)
                 .build());
