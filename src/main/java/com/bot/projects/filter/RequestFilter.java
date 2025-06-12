@@ -40,7 +40,7 @@ public class RequestFilter implements Filter {
 
             parseConnectionString(database.toString());
             MapCurrentSession(currentSessionDetail);
-            currentSessionDetail.setLocalConnectionString(database.toString());
+            currentSession.setLocalConnectionString(database.toString());
 
         } catch (Exception ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unauthorized access. Please try with valid token.");
@@ -68,6 +68,7 @@ public class RequestFilter implements Filter {
         currentSession.setFullName(session.getFullName());
         currentSession.setManagerName(session.getManagerName());
         currentSession.setFinancialStartYear(session.getFinancialStartYear());
+        currentSession.setCompanyCode(session.getCompanyCode());
     }
 
     public void parseConnectionString(String connectionString) {

@@ -151,11 +151,11 @@ public class ProjectService implements IProjectService {
         var projectDescriptionPath = saveProjectDescription(projectData, projectData.getProjectDescription());
         projectData.setProjectDescriptionFilePath(projectDescriptionPath);
 
-        MultipartFile[] fileArray = new MultipartFile[]{thumbnail};
-        var thumbnailDetail = saveProjectFile(fileArray, null, projectData.getProjectId());
-        var thumbnailPath = Paths.get(thumbnailDetail.get(0).getFilePath(), thumbnailDetail.get(0).getFileName()).toString();
-        thumbnailPath = replaceEscapeCharacter(thumbnailPath);
-        projectData.setThumbnailPath(thumbnailPath);
+//        MultipartFile[] fileArray = new MultipartFile[]{thumbnail};
+//        var thumbnailDetail = saveProjectFile(fileArray, null, projectData.getProjectId());
+//        var thumbnailPath = Paths.get(thumbnailDetail.get(0).getFilePath(), thumbnailDetail.get(0).getFileName()).toString();
+//        thumbnailPath = replaceEscapeCharacter(thumbnailPath);
+//        projectData.setThumbnailPath(thumbnailPath);
 
         if (attachment != null && attachment.length > 0) {
             var attachmentPaths = new ArrayList<ProjectAttachment>();
