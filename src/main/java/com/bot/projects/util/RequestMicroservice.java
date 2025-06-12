@@ -102,7 +102,7 @@ public class RequestMicroservice {
             //headers.setBearerAuth(microserviceRequest.getToken());
 
             DbConfigModal dbConfigModal = discretConnectionString(microserviceRequest.connectionString);
-            headers.add("database", mapper.writeValueAsString(dbConfigModal));
+            headers.add("database", microserviceRequest.connectionString);
             headers.add("companyCode", microserviceRequest.getCompanyCode());
         } catch (Exception ex) {
             throw new Exception(ex.getMessage());
@@ -117,7 +117,7 @@ public class RequestMicroservice {
         //headers.setBearerAuth(microserviceRequest.getToken());
 
         DbConfigModal dbConfigModal = discretConnectionString(microserviceRequest.connectionString);
-        headers.put("database", mapper.writeValueAsString(dbConfigModal));
+        headers.put("database", microserviceRequest.connectionString);
         headers.put("companyCode", microserviceRequest.getCompanyCode());
 
         return headers;
